@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 public class MainClass_Bagging {
     public static void main(String[] args) throws IOException {
         // read the entire dataset after the FS process
-        var dataPath = "C:\\Users\\20187\\Desktop\\BCS-Leaf Classification\\Binary Cuckoo Search For Plant Leaf Prediction\\Entire Data Folder\\Swedish After IBCS-FS\\Swedish After FS.csv";
+        var dataPath = "C:\\Users\\janch\\IdeaProjects\\Binary-Cuckoo-Search-For-Plant-Leaf-Prediction\\Entire Data Folder\\Swedish After IBCS-FS\\Swedish After FS.csv";
         var dataSource = new CSVLoader<>(new LabelFactory()).loadDataSource(Paths.get(dataPath), "Class");
         var Data = new MutableDataset<>(dataSource);
 
@@ -40,6 +40,18 @@ public class MainClass_Bagging {
         var sTrain = System.currentTimeMillis();
         var ensembleLearningTrainer = trainer.train(Data);
         var eTrain = System.currentTimeMillis();
+
+        // ---------------------------------------------------------
+        // NEW CODE: Save the fully trained model to your hard drive
+        // ---------------------------------------------------------
+        System.out.println("Saving model to disk...");
+        try (java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(new java.io.FileOutputStream("Swedish_Plant_Model.ser"))) {
+            oos.writeObject(ensembleLearningTrainer);
+            System.out.println("Success! Model saved as 'Swedish_Plant_Model.ser' in your project root.");
+        } catch (java.io.IOException e) {
+            System.err.println("Error saving the model: " + e.getMessage());
+        }
+        // ---------------------------------------------------------
 
         // define evaluater to test the model to get the output
         var labelEvaluator = new LabelEvaluator().evaluate(ensembleLearningTrainer, Data);

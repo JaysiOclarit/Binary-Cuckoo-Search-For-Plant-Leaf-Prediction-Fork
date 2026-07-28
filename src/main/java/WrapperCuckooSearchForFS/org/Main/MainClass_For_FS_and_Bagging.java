@@ -22,7 +22,7 @@ import java.nio.file.Paths;
 public class MainClass_For_FS_and_Bagging {
     public static void main(String[] args) throws IOException {
         // read the data
-        var dataPath = "C:\\Users\\20187\\Desktop\\BCS-Leaf Classification\\Binary Cuckoo Search For Plant Leaf Prediction\\Entire Data Folder\\Original Dataset\\Flavia Leaf data.csv";
+        var dataPath = "C:\\Users\\janch\\IdeaProjects\\Binary-Cuckoo-Search-For-Plant-Leaf-Prediction\\Entire Data Folder\\Original Dataset\\Philippine Leaf data.csv";
         var dataSource = new CSVLoader<>(new LabelFactory()).loadDataSource(Paths.get(dataPath), "Class");
 
         var dataSplitting = new TrainTestSplitter<>(dataSource, 0.6, Trainer.DEFAULT_SEED);
@@ -64,7 +64,7 @@ public class MainClass_For_FS_and_Bagging {
         var SFDS = new SelectedFeatureDataset<>(trainData, SFS);
 
         // save the selected subset of features
-        new CSVSaver().save(Paths.get(System.getProperty("user.dir") + "\\xxxx data After FS.csv"),
+        new CSVSaver().save(Paths.get(System.getProperty("user.dir") + "\\Philippine After FS.csv"),
                 SFDS,
                 "Class");
 
