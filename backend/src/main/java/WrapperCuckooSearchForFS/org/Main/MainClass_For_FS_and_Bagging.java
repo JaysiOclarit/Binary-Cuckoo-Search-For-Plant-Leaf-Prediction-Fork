@@ -64,14 +64,27 @@ public class MainClass_For_FS_and_Bagging {
                 var eDate = System.currentTimeMillis();
                 var SFDS = new SelectedFeatureDataset<>(trainData, SFS);
 
-                // save the selected subset of features
+                // Export convergence history to CSV for plotting & documentation
+                String csvPath = "BCS_Convergence_History.csv";
+                optimizer.exportConvergenceCSV(csvPath);
+
+                // Save the selected subset of features
                 new CSVSaver().save(Paths.get(System.getProperty("user.dir") + "\\Swedish After FS.csv"),
                                 SFDS,
                                 "Class");
 
-                System.out.printf(
-                                "The FS duration time is : %s\nThe number of selected features is : %d\nThe feature names are : %s\n",
-                                Util.formatDuration(sDate, eDate), SFDS.size(), SFDS.getFeatureSet().featureNames());
+                double reductionRatio = (1.0 - ((double) SFDS.size() / trainData.getFeatureMap().size())) * 100.0;
+                int optIter = optimizer.getOptimalConvergenceIteration();
+
+                System.out.println("=================================================");
+                System.out.println("BCS Feature Selection Analysis & Results:");
+                System.out.printf("FS Duration: %s\n", Util.formatDuration(sDate, eDate));
+                System.out.printf("Convergence Speed (Optimal Iteration): Iteration %d (out of 20)\n", optIter);
+                System.out.printf("Original Feature Count: %d\n", trainData.getFeatureMap().size());
+                System.out.printf("Selected Feature Subset Size: %d\n", SFDS.size());
+                System.out.printf("Feature Reduction Ratio (FRR): %.2f%%\n", reductionRatio);
+                System.out.println("Convergence History Exported To: " + csvPath);
+                System.out.println("=================================================");
 
                 /*
                  * Here you store the data after feature selection (FS) for the training part

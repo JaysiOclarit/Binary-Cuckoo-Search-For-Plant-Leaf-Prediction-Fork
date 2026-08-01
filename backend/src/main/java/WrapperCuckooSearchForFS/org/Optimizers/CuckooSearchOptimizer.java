@@ -180,9 +180,55 @@ public  final class CuckooSearchOptimizer implements FeatureSelector<Label> {
                     FN.EvaluateSolution(this, dataset, FMap, subSet))).
                     forEach(subSet_fScores::add);
             subSet_fScores.sort(Comparator.comparing(CuckooSearchFeatureSet::score).reversed());
-            selectedFeatureSet = FN.getSFS(this, dataset, FMap, subSet_fScores.get(0).subSet);
+            
+            // Track per-iteration convergence metrics
+            int[] bestSubSet = subSet_fScores.get(0).subSet;
+            double bestScore = subSet_fScores.get(0).score;
+            int selectedCount = 0;
+            for (int bit : bestSubSet) if (bit == 1) selectedCount++;
+            double redRatio = (1.0 - ((double) selectedCount / dataset.getFeatureMap().size())) * 100.0;
+            convergenceHistory.add(new ConvergenceStep(iter, bestScore, selectedCount, redRatio));
+
+            selectedFeatureSet = FN.getSFS(this, dataset, FMap, bestSubSet);
         }
         return selectedFeatureSet;
+    }
+
+    private final List<ConvergenceStep> convergenceHistory = new ArrayList<>();
+
+    /**
+     * Returns the iteration-by-iteration convergence history.
+     */
+    public List<ConvergenceStep> getConvergenceHistory() {
+        return new ArrayList<>(convergenceHistory);
+    }
+
+    /**
+     * Exports the convergence metrics to a CSV file for documentation and analysis.
+     */
+    public void exportConvergenceCSV(String filePath) throws java.io.IOException {
+        try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter(filePath))) {
+            pw.println("Iteration,BestFitnessScore,SelectedFeatures,ReductionRatioPercent");
+            for (ConvergenceStep step : convergenceHistory) {
+                pw.printf("%d,%.6f,%d,%.2f%%\n", step.iteration(), step.bestFitness(), step.selectedFeatures(), step.reductionRatioPercent());
+            }
+        }
+    }
+
+    /**
+     * Finds the iteration number where the peak/optimal fitness score was first reached.
+     */
+    public int getOptimalConvergenceIteration() {
+        if (convergenceHistory.isEmpty()) return -1;
+        double maxFitness = -1.0;
+        int optIter = 1;
+        for (ConvergenceStep step : convergenceHistory) {
+            if (step.bestFitness() > maxFitness) {
+                maxFitness = step.bestFitness();
+                optIter = step.iteration();
+            }
+        }
+        return optIter;
     }
 
     @Override
@@ -203,6 +249,11 @@ public  final class CuckooSearchOptimizer implements FeatureSelector<Label> {
             System.arraycopy(alteredSolution, 0, oldSolution, 0, alteredSolution.length);
         }
     }
+
+    /**
+     * Record holding per-iteration convergence statistics.
+     */
+    public record ConvergenceStep(int iteration, double bestFitness, int selectedFeatures, double reductionRatioPercent) { }
 
     /**
      * This record is used to hold subset of features with its corresponding fitness score
