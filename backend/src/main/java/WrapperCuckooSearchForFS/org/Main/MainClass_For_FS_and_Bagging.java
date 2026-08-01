@@ -21,79 +21,73 @@ import java.nio.file.Paths;
 
 public class MainClass_For_FS_and_Bagging {
         public static void main(String[] args) throws IOException {
-                // read the data
-                var dataPath = Paths.get("Entire Data Folder", "Original Dataset", "Swedish Leaf data.csv").toString();
-                var dataSource = new CSVLoader<>(new LabelFactory()).loadDataSource(Paths.get(dataPath), "Class");
+                // Find all raw dataset CSV files inside Entire Data Folder/Original Dataset/
+                java.io.File originalDir = Paths.get("Entire Data Folder", "Original Dataset").toFile();
+                java.io.File[] rawCsvFiles = originalDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".csv"));
 
-                var dataSplitting = new TrainTestSplitter<>(dataSource, 0.6, Trainer.DEFAULT_SEED);
-                var trainData = new MutableDataset<>(dataSplitting.getTrain());
-                var testData = new MutableDataset<>(dataSplitting.getTest());
+                if (rawCsvFiles == null || rawCsvFiles.length == 0) {
+                        System.err.println("ERROR: No raw dataset CSV files found in: " + originalDir.getAbsolutePath());
+                        return;
+                }
 
-                // use the feature selection optimizer based on the given learner
-                var learner = new KNNTrainer<>(1,
-                                new L2Distance(),
-                                Runtime.getRuntime().availableProcessors(),
-                                new VotingCombiner(),
-                                KNNModel.Backend.THREADPOOL,
-                                NeighboursQueryFactoryType.BRUTE_FORCE);
+                System.out.println("=================================================================");
+                System.out.println("   BATCH BASELINE BINARY CUCKOO SEARCH (BCS) FEATURE SELECTION   ");
+                System.out.println("=================================================================\n");
 
-                // use IBCS for FS
-                var optimizer = new CuckooSearchOptimizer(learner,
-                                TransferFunction.V2,
-                                30,
-                                2d,
-                                2d,
-                                0.1d,
-                                1.5d,
-                                20,
-                                12345);
+                for (java.io.File csvFile : rawCsvFiles) {
+                        String fileName = csvFile.getName();
+                        // Extract dataset prefix (e.g. "Swedish", "Flavia", "Philippine")
+                        String datasetPrefix = fileName.split(" ")[0]; 
 
-                /*
-                 * // use mRMR filter-based FS
-                 * var sDate = System.currentTimeMillis();
-                 * var SFS = new mRMR(500,
-                 * 10,
-                 * Runtime.getRuntime().availableProcessors())
-                 * .select(trainPart);
-                 * var eDate = System.currentTimeMillis();
-                 * var SFDS = new SelectedFeatureDataset<>(trainPart, SFS);
-                 */
+                        System.out.println("-----------------------------------------------------------------");
+                        System.out.println("Processing Raw Dataset: " + fileName + " (" + datasetPrefix + ")");
+                        System.out.println("Path: " + csvFile.getAbsolutePath());
 
-                var sDate = System.currentTimeMillis();
-                var SFS = optimizer.select(trainData);
-                var eDate = System.currentTimeMillis();
-                var SFDS = new SelectedFeatureDataset<>(trainData, SFS);
+                        var dataSource = new CSVLoader<>(new LabelFactory()).loadDataSource(csvFile.toPath(), "Class");
+                        var dataSplitting = new TrainTestSplitter<>(dataSource, 0.6, Trainer.DEFAULT_SEED);
+                        var trainData = new MutableDataset<>(dataSplitting.getTrain());
 
-                // Export convergence history to CSV for plotting & documentation
-                String csvPath = "BCS_Convergence_History.csv";
-                optimizer.exportConvergenceCSV(csvPath);
+                        // Learner & Optimizer setup
+                        var learner = new KNNTrainer<>(1,
+                                        new L2Distance(),
+                                        Runtime.getRuntime().availableProcessors(),
+                                        new VotingCombiner(),
+                                        KNNModel.Backend.THREADPOOL,
+                                        NeighboursQueryFactoryType.BRUTE_FORCE);
 
-                // Save the selected subset of features
-                new CSVSaver().save(Paths.get(System.getProperty("user.dir") + "\\Swedish After FS.csv"),
-                                SFDS,
-                                "Class");
+                        var optimizer = new CuckooSearchOptimizer(learner,
+                                        TransferFunction.V2,
+                                        30, 2d, 2d, 0.1d, 1.5d, 20, 12345);
 
-                double reductionRatio = (1.0 - ((double) SFDS.size() / trainData.getFeatureMap().size())) * 100.0;
-                int optIter = optimizer.getOptimalConvergenceIteration();
+                        var sDate = System.currentTimeMillis();
+                        var SFS = optimizer.select(trainData);
+                        var eDate = System.currentTimeMillis();
+                        var SFDS = new SelectedFeatureDataset<>(trainData, SFS);
 
-                System.out.println("=================================================");
-                System.out.println("BCS Feature Selection Analysis & Results:");
-                System.out.printf("FS Duration: %s\n", Util.formatDuration(sDate, eDate));
-                System.out.printf("Convergence Speed (Optimal Iteration): Iteration %d (out of 20)\n", optIter);
-                System.out.printf("Original Feature Count: %d\n", trainData.getFeatureMap().size());
-                System.out.printf("Selected Feature Subset Size: %d\n", SFDS.size());
-                System.out.printf("Feature Reduction Ratio (FRR): %.2f%%\n", reductionRatio);
-                System.out.println("Convergence History Exported To: " + csvPath);
-                System.out.println("=================================================");
+                        // Export per-dataset convergence history
+                        String csvConvergencePath = datasetPrefix + "_BCS_Convergence_History.csv";
+                        optimizer.exportConvergenceCSV(csvConvergencePath);
 
-                /*
-                 * Here you store the data after feature selection (FS) for the training part
-                 * only.
-                 * To get the values or columns of the features in the generated training set
-                 * after FS,
-                 * you should use the TableSaw library or another library to drop the unwanted
-                 * features
-                 * and keep the ones that match the training part.
-                 */
+                        // Save feature-selected dataset CSV (e.g., "Swedish After FS.csv")
+                        String outputCsvName = datasetPrefix + " After FS.csv";
+                        java.nio.file.Path outputPath = Paths.get(System.getProperty("user.dir"), outputCsvName);
+                        new CSVSaver().save(outputPath, SFDS, "Class");
+
+                        double reductionRatio = (1.0 - ((double) SFDS.size() / trainData.getFeatureMap().size())) * 100.0;
+                        int optIter = optimizer.getOptimalConvergenceIteration();
+
+                        System.out.println("\nRESULTS for " + datasetPrefix + " (BCS):");
+                        System.out.printf("  FS Duration: %s\n", Util.formatDuration(sDate, eDate));
+                        System.out.printf("  Optimal Convergence Iteration: Iteration %d (out of 20)\n", optIter);
+                        System.out.printf("  Original Feature Count: %d\n", trainData.getFeatureMap().size());
+                        System.out.printf("  Selected Feature Count: %d\n", SFDS.size());
+                        System.out.printf("  Feature Reduction Ratio (FRR): %.2f%%\n", reductionRatio);
+                        System.out.println("  Saved Dataset To: " + outputPath);
+                        System.out.println("  Saved Convergence To: " + csvConvergencePath);
+                }
+
+                System.out.println("\n=================================================================");
+                System.out.println("SUCCESS: All raw datasets processed with Baseline BCS!");
+                System.out.println("=================================================================");
         }
 }
