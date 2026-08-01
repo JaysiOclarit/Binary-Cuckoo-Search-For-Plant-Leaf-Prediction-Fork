@@ -18,6 +18,8 @@ import org.tribuo.util.Util;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainClass_For_FS_and_Bagging {
         public static void main(String[] args) throws IOException {
@@ -26,7 +28,8 @@ public class MainClass_For_FS_and_Bagging {
                 java.io.File[] rawCsvFiles = originalDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".csv"));
 
                 if (rawCsvFiles == null || rawCsvFiles.length == 0) {
-                        System.err.println("ERROR: No raw dataset CSV files found in: " + originalDir.getAbsolutePath());
+                        System.err.println(
+                                        "ERROR: No raw dataset CSV files found in: " + originalDir.getAbsolutePath());
                         return;
                 }
 
@@ -34,10 +37,13 @@ public class MainClass_For_FS_and_Bagging {
                 System.out.println("   BATCH BASELINE BINARY CUCKOO SEARCH (BCS) FEATURE SELECTION   ");
                 System.out.println("=================================================================\n");
 
+                record FSSummary(String dataset, int originalFeatures, int selectedFeatures, double reductionRatio, String duration) {}
+                List<FSSummary> summaryList = new ArrayList<>();
+
                 for (java.io.File csvFile : rawCsvFiles) {
                         String fileName = csvFile.getName();
                         // Extract dataset prefix (e.g. "Swedish", "Flavia", "Philippine")
-                        String datasetPrefix = fileName.split(" ")[0]; 
+                        String datasetPrefix = fileName.split(" ")[0];
 
                         System.out.println("-----------------------------------------------------------------");
                         System.out.println("Processing Raw Dataset: " + fileName + " (" + datasetPrefix + ")");
@@ -75,14 +81,19 @@ public class MainClass_For_FS_and_Bagging {
                         java.nio.file.Path outputPath = targetDir.toPath().resolve(outputCsvName);
                         new CSVSaver().save(outputPath, SFDS, "Class");
 
-                        String csvConvergencePath = targetDir.toPath().resolve(datasetPrefix + "_BCS_Convergence_History.csv").toString();
+                        String csvConvergencePath = targetDir.toPath()
+                                        .resolve(datasetPrefix + "_BCS_Convergence_History.csv").toString();
                         optimizer.exportConvergenceCSV(csvConvergencePath);
 
-                        double reductionRatio = (1.0 - ((double) SFDS.size() / trainData.getFeatureMap().size())) * 100.0;
+                        double reductionRatio = (1.0 - ((double) SFDS.size() / trainData.getFeatureMap().size()))
+                                        * 100.0;
                         int optIter = optimizer.getOptimalConvergenceIteration();
+                        String durationStr = Util.formatDuration(sDate, eDate);
+
+                        summaryList.add(new FSSummary(datasetPrefix, trainData.getFeatureMap().size(), SFDS.size(), reductionRatio, durationStr));
 
                         System.out.println("\nRESULTS for " + datasetPrefix + " (BCS):");
-                        System.out.printf("  FS Duration: %s\n", Util.formatDuration(sDate, eDate));
+                        System.out.printf("  FS Duration: %s\n", durationStr);
                         System.out.printf("  Optimal Convergence Iteration: Iteration %d (out of 20)\n", optIter);
                         System.out.printf("  Original Feature Count: %d\n", trainData.getFeatureMap().size());
                         System.out.printf("  Selected Feature Count: %d\n", SFDS.size());
@@ -91,7 +102,16 @@ public class MainClass_For_FS_and_Bagging {
                         System.out.println("  Saved Convergence To: " + csvConvergencePath);
                 }
 
-                System.out.println("\n=================================================================");
+                System.out.println("\n=========================================================================================");
+                System.out.println("   FINAL BATCH BASELINE BCS FEATURE SELECTION SUMMARY TABLE");
+                System.out.println("=========================================================================================");
+                System.out.printf("%-15s | %-12s | %-12s | %-12s | %-15s\n", "Dataset", "Orig Features", "Sel Features", "FRR (%)", "Duration");
+                System.out.println("-----------------------------------------------------------------------------------------");
+                for (FSSummary s : summaryList) {
+                        System.out.printf("%-15s | %-12d | %-12d | %-11.2f%% | %-15s\n",
+                                        s.dataset(), s.originalFeatures(), s.selectedFeatures(), s.reductionRatio(), s.duration());
+                }
+                System.out.println("=========================================================================================");
                 System.out.println("SUCCESS: All raw datasets processed with Baseline BCS!");
                 System.out.println("=================================================================");
         }
