@@ -11,7 +11,7 @@ import org.tribuo.classification.Label;
 import org.tribuo.classification.ensemble.VotingCombiner;
 import org.tribuo.common.nearest.KNNModel;
 import org.tribuo.common.nearest.KNNTrainer;
-import org.tribuo.math.distance.L1Distance;
+import org.tribuo.math.distance.L2Distance;
 import org.tribuo.math.neighbour.NeighboursQueryFactoryType;
 import org.tribuo.provenance.FeatureSelectorProvenance;
 import org.tribuo.provenance.impl.FeatureSelectorProvenanceImpl;
@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
 import java.util.SplittableRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -56,7 +55,7 @@ public  final class CuckooSearchOptimizer implements FeatureSelector<Label> {
         this.transferFunction = TransferFunction.V2;
         this.populationSize = 50;
         KNNTrainer<Label> KnnTrainer =  new KNNTrainer<>(1,
-                new L1Distance(),
+                new L2Distance(),
                 Runtime.getRuntime().availableProcessors(),
                 new VotingCombiner(),
                 KNNModel.Backend.THREADPOOL,
@@ -85,7 +84,7 @@ public  final class CuckooSearchOptimizer implements FeatureSelector<Label> {
         FN = new FitnessFunction(trainer);
         this.stepSizeScaling = 2d;
         this.lambda = 2d;
-        this.worstNestProbability = 1.5d;
+        this.worstNestProbability = 0.1d;
         this.delta = 1.5d;
         this.maxIteration = maxIteration;
         this.seed = seed;
@@ -155,25 +154,28 @@ public  final class CuckooSearchOptimizer implements FeatureSelector<Label> {
         List<CuckooSearchFeatureSet> subSet_fScores = new ArrayList<>();
         SelectedFeatureSet selectedFeatureSet = null;
         for (int i = 0; i < maxIteration; i++) {
+            final int iter = i + 1;
             for (int solution = 0; solution < setOfSolutions.length; solution++) {
                 AtomicInteger subSet = new AtomicInteger(solution);
                 // Update the solution based on the levy flight function
                 int[] evolvedSolution = Arrays.stream(setOfSolutions[subSet.get()]).map(x -> (int) transferFunction.
-                        applyAsDouble(x + stepSizeScaling * Math.pow(subSet.get() + 1, -lambda))).toArray();
+                        applyAsDouble(x + stepSizeScaling * Math.pow(iter, -lambda))).toArray();
                 int[] randomCuckoo = setOfSolutions[rng.nextInt(setOfSolutions.length)];
                 keepBestAfterEvaluation(dataset, FMap, evolvedSolution, randomCuckoo);
-                // Update the solution based on the abandone nest function
-                if (new Random().nextDouble() < worstNestProbability) {
+                // Update the solution based on the abandon nest function
+                if (rng.nextDouble() < worstNestProbability) {
                     int r1 = rng.nextInt(setOfSolutions.length);
                     int r2 = rng.nextInt(setOfSolutions.length);
+                    double randDelta = rng.nextDouble() * delta;
                     for (int j = 0; j < setOfSolutions[subSet.get()].length; j++) {
                         evolvedSolution[j] = (int) transferFunction.
                                 applyAsDouble(setOfSolutions[subSet.get()][j] +
-                                delta * (setOfSolutions[r1][j] - setOfSolutions[r2][j]));
+                                randDelta * (setOfSolutions[r1][j] - setOfSolutions[r2][j]));
                     }
                     keepBestAfterEvaluation(dataset, FMap, evolvedSolution, setOfSolutions[subSet.get()]);
-                    }
+                }
             }
+            subSet_fScores.clear();
             Arrays.stream(setOfSolutions).map(subSet -> new CuckooSearchFeatureSet(subSet,
                     FN.EvaluateSolution(this, dataset, FMap, subSet))).
                     forEach(subSet_fScores::add);

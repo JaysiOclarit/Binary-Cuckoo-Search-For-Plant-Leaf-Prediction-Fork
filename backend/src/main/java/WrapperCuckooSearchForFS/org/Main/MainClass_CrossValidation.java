@@ -19,7 +19,7 @@ import java.nio.file.Paths;
 public class MainClass_CrossValidation {
     public static void main(String[] args) throws IOException {
         // read the entire dataset after the FS process
-        var dataPath = "C:\\Users\\janch\\IdeaProjects\\Binary-Cuckoo-Search-For-Plant-Leaf-Prediction\\backend\\Entire Data Folder\\Flavia After IBCS-FS\\Flavia After FS(2).csv";
+        var dataPath = Paths.get("Entire Data Folder", "Flavia After IBCS-FS", "Flavia After FS(2).csv").toString();
         var dataSource = new CSVLoader<>(new LabelFactory()).loadDataSource(Paths.get(dataPath), "Class");
         var Data = new MutableDataset<>(dataSource);
 
