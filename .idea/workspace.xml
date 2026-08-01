@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e0562cd-5a1d-47b8-b2b2-0fe01757f967" name="Changes" comment="" />
+    <list default="true" id="8e0562cd-5a1d-47b8-b2b2-0fe01757f967" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -47,10 +49,14 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/janch/IdeaProjects/Binary-Cuckoo-Search-For-Plant-Leaf-Prediction/Research Paper&quot;,
     &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;
   }
 }</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\janch\IdeaProjects\Binary-Cuckoo-Search-For-Plant-Leaf-Prediction\Research Paper" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\janch\IdeaProjects\Binary-Cuckoo-Search-For-Plant-Leaf-Prediction\backend" />
       <recent name="C:\Users\janch\IdeaProjects\Binary-Cuckoo-Search-For-Plant-Leaf-Prediction\backend\Entire Data Folder\Swedish After IBCS-FS" />
