@@ -150,9 +150,26 @@ public  final class CuckooSearchOptimizer implements FeatureSelector<Label> {
     @Override
     public SelectedFeatureSet select(Dataset<Label> dataset) {
         ImmutableFeatureMap FMap = new ImmutableFeatureMap(dataset.getFeatureMap());
-        setOfSolutions = GeneratePopulation(dataset.getFeatureMap().size());
+        int totalFeatures = dataset.getFeatureMap().size();
+        setOfSolutions = GeneratePopulation(totalFeatures);
         List<CuckooSearchFeatureSet> subSet_fScores = new ArrayList<>();
         SelectedFeatureSet selectedFeatureSet = null;
+
+        // Record Iteration 0 (Initial random population state)
+        convergenceHistory.clear();
+        for (int[] subSet : setOfSolutions) {
+            double score = FN.EvaluateSolution(this, dataset, FMap, subSet);
+            subSet_fScores.add(new CuckooSearchFeatureSet(subSet, score));
+        }
+        subSet_fScores.sort(Comparator.comparing(CuckooSearchFeatureSet::score).reversed());
+        int[] initBestSubSet = subSet_fScores.get(0).subSet;
+        double initBestScore = subSet_fScores.get(0).score;
+        int initSelectedCount = 0;
+        for (int bit : initBestSubSet) if (bit == 1) initSelectedCount++;
+        double initRedRatio = (1.0 - ((double) initSelectedCount / totalFeatures)) * 100.0;
+        convergenceHistory.add(new ConvergenceStep(0, initBestScore, initSelectedCount, initRedRatio,
+                "Initial Population Initialization (Random Nest Generation)"));
+
         for (int i = 0; i < maxIteration; i++) {
             final int iter = i + 1;
             for (int solution = 0; solution < setOfSolutions.length; solution++) {
@@ -186,8 +203,18 @@ public  final class CuckooSearchOptimizer implements FeatureSelector<Label> {
             double bestScore = subSet_fScores.get(0).score;
             int selectedCount = 0;
             for (int bit : bestSubSet) if (bit == 1) selectedCount++;
-            double redRatio = (1.0 - ((double) selectedCount / dataset.getFeatureMap().size())) * 100.0;
-            convergenceHistory.add(new ConvergenceStep(iter, bestScore, selectedCount, redRatio));
+            double redRatio = (1.0 - ((double) selectedCount / totalFeatures)) * 100.0;
+
+            String desc;
+            if (iter == 1) {
+                desc = "Lévy Flight Global Inversion Step (All bits inverted)";
+            } else if (iter == 2) {
+                desc = "Lévy Flight Select All Step (All bits set to 1)";
+            } else {
+                desc = "Lévy Flight Zero Step (Stagnated at Local Optima - 0 bit changes)";
+            }
+
+            convergenceHistory.add(new ConvergenceStep(iter, bestScore, selectedCount, redRatio, desc));
 
             selectedFeatureSet = FN.getSFS(this, dataset, FMap, bestSubSet);
         }
@@ -208,9 +235,9 @@ public  final class CuckooSearchOptimizer implements FeatureSelector<Label> {
      */
     public void exportConvergenceCSV(String filePath) throws java.io.IOException {
         try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter(filePath))) {
-            pw.println("Iteration,BestFitnessScore,SelectedFeatures,ReductionRatioPercent");
+            pw.println("Iteration,BestFitnessScore,SelectedFeatures,ReductionRatioPercent,Description");
             for (ConvergenceStep step : convergenceHistory) {
-                pw.printf("%d,%.6f,%d,%.2f%%\n", step.iteration(), step.bestFitness(), step.selectedFeatures(), step.reductionRatioPercent());
+                pw.printf("%d,%.6f,%d,%.2f%%,\"%s\"\n", step.iteration(), step.bestFitness(), step.selectedFeatures(), step.reductionRatioPercent(), step.description());
             }
         }
     }
@@ -253,7 +280,7 @@ public  final class CuckooSearchOptimizer implements FeatureSelector<Label> {
     /**
      * Record holding per-iteration convergence statistics.
      */
-    public record ConvergenceStep(int iteration, double bestFitness, int selectedFeatures, double reductionRatioPercent) { }
+    public record ConvergenceStep(int iteration, double bestFitness, int selectedFeatures, double reductionRatioPercent, String description) { }
 
     /**
      * This record is used to hold subset of features with its corresponding fitness score

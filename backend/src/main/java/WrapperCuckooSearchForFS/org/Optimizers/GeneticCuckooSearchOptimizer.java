@@ -104,11 +104,19 @@ public final class GeneticCuckooSearchOptimizer implements FeatureSelector<Label
     /**
      * Generates initial random binary population.
      */
+    private double[][] continuousPositions;
+
+    /**
+     * Generates initial random continuous positions in [-2.0, 2.0] and initial binary population.
+     */
     private int[][] generatePopulation(int totalNumberOfFeatures) {
         setOfSolutions = new int[this.populationSize][totalNumberOfFeatures];
-        for (int[] subSet : setOfSolutions) {
-            for (int i = 0; i < subSet.length; i++) {
-                subSet[i] = rng.nextInt(2);
+        continuousPositions = new double[this.populationSize][totalNumberOfFeatures];
+
+        for (int s = 0; s < setOfSolutions.length; s++) {
+            for (int j = 0; j < totalNumberOfFeatures; j++) {
+                continuousPositions[s][j] = (rng.nextDouble() * 4.0) - 2.0;
+                setOfSolutions[s][j] = (int) transferFunction.applyAsDouble(continuousPositions[s][j]);
             }
         }
         return setOfSolutions;
@@ -128,24 +136,44 @@ public final class GeneticCuckooSearchOptimizer implements FeatureSelector<Label
         List<GBCSFeatureSet> solutionScores = new ArrayList<>();
         SelectedFeatureSet selectedFeatureSet = null;
 
+        // Record Iteration 0 (Initial random population state)
+        convergenceHistory.clear();
+        for (int[] solution : setOfSolutions) {
+            double score = fitnessFunction.EvaluateSolution(this, dataset, FMap, solution);
+            solutionScores.add(new GBCSFeatureSet(solution, score));
+        }
+        solutionScores.sort(Comparator.comparing(GBCSFeatureSet::score).reversed());
+        int[] initBestSubSet = solutionScores.get(0).subSet;
+        double initBestScore = solutionScores.get(0).score;
+        int initSelectedCount = 0;
+        for (int bit : initBestSubSet) if (bit == 1) initSelectedCount++;
+        double initRedRatio = (1.0 - ((double) initSelectedCount / numFeatures)) * 100.0;
+        convergenceHistory.add(new ConvergenceStep(0, initBestScore, initSelectedCount, initRedRatio,
+                "Initial Population Initialization (Random Nest Generation)"));
+
         for (int i = 0; i < maxIteration; i++) {
             final int iter = i + 1;
 
             for (int solutionIdx = 0; solutionIdx < setOfSolutions.length; solutionIdx++) {
-                int[] currentNest = setOfSolutions[solutionIdx];
+                double[] currentPos = continuousPositions[solutionIdx];
+                double[] evolvedPos = new double[numFeatures];
+                int[] evolvedSolution = new int[numFeatures];
 
-                // 1. Global Search: Lévy Flight Update
-                int[] evolvedSolution = Arrays.stream(currentNest)
-                        .map(x -> (int) transferFunction.applyAsDouble(x + stepSizeScaling * Math.pow(iter, -lambda)))
-                        .toArray();
+                // 1. Global Search: Stochastic Lévy Flight Update per dimension
+                for (int j = 0; j < numFeatures; j++) {
+                    double levyStep = (rng.nextDouble() - 0.5) * 2.0 * Math.pow(iter, -lambda);
+                    evolvedPos[j] = currentPos[j] + stepSizeScaling * levyStep;
+                    evolvedSolution[j] = (int) transferFunction.applyAsDouble(evolvedPos[j]);
+                }
 
                 // 2. Genetic Operators: Uniform Crossover
                 if (rng.nextDouble() < crossoverRate) {
                     int partnerIdx = rng.nextInt(setOfSolutions.length);
-                    int[] partnerNest = setOfSolutions[partnerIdx];
+                    double[] partnerPos = continuousPositions[partnerIdx];
                     for (int j = 0; j < numFeatures; j++) {
                         if (rng.nextBoolean()) {
-                            evolvedSolution[j] = partnerNest[j];
+                            evolvedPos[j] = partnerPos[j];
+                            evolvedSolution[j] = (int) transferFunction.applyAsDouble(evolvedPos[j]);
                         }
                     }
                 }
@@ -153,32 +181,37 @@ public final class GeneticCuckooSearchOptimizer implements FeatureSelector<Label
                 // 3. Genetic Operators: Bit Flip Mutation
                 for (int j = 0; j < numFeatures; j++) {
                     if (rng.nextDouble() < mutationRate) {
-                        evolvedSolution[j] = evolvedSolution[j] == 1 ? 0 : 1; // Flip bit
+                        evolvedSolution[j] = evolvedSolution[j] == 1 ? 0 : 1;
+                        evolvedPos[j] = -evolvedPos[j]; // Invert sign of continuous coordinate
                     }
                 }
 
-                // Compare with random nest and keep best
-                int[] randomCuckoo = setOfSolutions[rng.nextInt(setOfSolutions.length)];
-                keepBestAfterEvaluation(dataset, FMap, evolvedSolution, randomCuckoo);
+                int randomCuckooIdx = rng.nextInt(setOfSolutions.length);
+                keepBestAfterEvaluation(dataset, FMap, evolvedPos, evolvedSolution, randomCuckooIdx);
 
                 // 4. Local Search: Abandon Worst Nests (Random Walk)
                 if (rng.nextDouble() < worstNestProbability) {
                     int r1 = rng.nextInt(setOfSolutions.length);
                     int r2 = rng.nextInt(setOfSolutions.length);
                     double randDelta = rng.nextDouble() * delta;
+
+                    double[] abandonPos = new double[numFeatures];
+                    int[] abandonSolution = new int[numFeatures];
+
                     for (int j = 0; j < numFeatures; j++) {
-                        evolvedSolution[j] = (int) transferFunction.applyAsDouble(
-                                currentNest[j] + randDelta * (setOfSolutions[r1][j] - setOfSolutions[r2][j]));
+                        abandonPos[j] = continuousPositions[solutionIdx][j] +
+                                randDelta * (continuousPositions[r1][j] - continuousPositions[r2][j]);
+                        abandonSolution[j] = (int) transferFunction.applyAsDouble(abandonPos[j]);
                     }
-                    keepBestAfterEvaluation(dataset, FMap, evolvedSolution, currentNest);
+                    keepBestAfterEvaluation(dataset, FMap, abandonPos, abandonSolution, solutionIdx);
                 }
             }
 
             // Evaluate current population fitness scores
             solutionScores.clear();
-            for (int[] solution : setOfSolutions) {
-                double score = fitnessFunction.EvaluateSolution(this, dataset, FMap, solution);
-                solutionScores.add(new GBCSFeatureSet(solution, score));
+            for (int s = 0; s < setOfSolutions.length; s++) {
+                double score = fitnessFunction.EvaluateSolution(this, dataset, FMap, setOfSolutions[s]);
+                solutionScores.add(new GBCSFeatureSet(setOfSolutions[s], score));
             }
 
             solutionScores.sort(Comparator.comparing(GBCSFeatureSet::score).reversed());
@@ -191,7 +224,8 @@ public final class GeneticCuckooSearchOptimizer implements FeatureSelector<Label
                 if (bit == 1)
                     selectedCount++;
             double redRatio = (1.0 - ((double) selectedCount / numFeatures)) * 100.0;
-            convergenceHistory.add(new ConvergenceStep(iter, bestScore, selectedCount, redRatio));
+            String desc = "Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)";
+            convergenceHistory.add(new ConvergenceStep(iter, bestScore, selectedCount, redRatio, desc));
 
             selectedFeatureSet = fitnessFunction.getSFS(this, dataset, FMap, bestSubSet);
         }
@@ -213,10 +247,10 @@ public final class GeneticCuckooSearchOptimizer implements FeatureSelector<Label
      */
     public void exportConvergenceCSV(String filePath) throws java.io.IOException {
         try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter(filePath))) {
-            pw.println("Iteration,BestFitnessScore,SelectedFeatures,ReductionRatioPercent");
+            pw.println("Iteration,BestFitnessScore,SelectedFeatures,ReductionRatioPercent,Description");
             for (ConvergenceStep step : convergenceHistory) {
-                pw.printf("%d,%.6f,%d,%.2f%%\n", step.iteration(), step.bestFitness(), step.selectedFeatures(),
-                        step.reductionRatioPercent());
+                pw.printf("%d,%.6f,%d,%.2f%%,\"%s\"\n", step.iteration(), step.bestFitness(), step.selectedFeatures(),
+                        step.reductionRatioPercent(), step.description());
             }
         }
     }
@@ -244,20 +278,19 @@ public final class GeneticCuckooSearchOptimizer implements FeatureSelector<Label
         return new FeatureSelectorProvenanceImpl(this);
     }
 
-    private void keepBestAfterEvaluation(Dataset<Label> dataset, ImmutableFeatureMap FMap, int[] alteredSolution,
-            int[] oldSolution) {
+    private void keepBestAfterEvaluation(Dataset<Label> dataset, ImmutableFeatureMap FMap, double[] alteredPos, int[] alteredSolution, int targetIdx) {
         double scoreOfModifiedSolution = fitnessFunction.EvaluateSolution(this, dataset, FMap, alteredSolution);
-        double scoreOfSolution = fitnessFunction.EvaluateSolution(this, dataset, FMap, oldSolution);
+        double scoreOfSolution = fitnessFunction.EvaluateSolution(this, dataset, FMap, setOfSolutions[targetIdx]);
         if (scoreOfModifiedSolution > scoreOfSolution) {
-            System.arraycopy(alteredSolution, 0, oldSolution, 0, alteredSolution.length);
+            System.arraycopy(alteredSolution, 0, setOfSolutions[targetIdx], 0, alteredSolution.length);
+            System.arraycopy(alteredPos, 0, continuousPositions[targetIdx], 0, alteredPos.length);
         }
     }
 
     /**
      * Record holding per-iteration convergence statistics.
      */
-    public record ConvergenceStep(int iteration, double bestFitness, int selectedFeatures,
-            double reductionRatioPercent) {
+    public record ConvergenceStep(int iteration, double bestFitness, int selectedFeatures, double reductionRatioPercent, String description) {
     }
 
     record GBCSFeatureSet(int[] subSet, double score) {
