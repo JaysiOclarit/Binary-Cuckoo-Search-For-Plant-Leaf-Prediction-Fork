@@ -45,7 +45,7 @@ public class MainClass_Bagging {
         // NEW CODE: Save the fully trained model to your hard drive
         // ---------------------------------------------------------
         System.out.println("Saving model to disk...");
-        try (java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(new java.io.FileOutputStream("Philippine_Plant_Model(2).ser"))) {
+        try (java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(new java.io.FileOutputStream("Philippine_Plant_Model.ser"))) {
             oos.writeObject(ensembleLearningTrainer);
             System.out.println("Success! Model saved as 'Philippine_Plant_Model.ser' in your project root.");
         } catch (java.io.IOException e) {

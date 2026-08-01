@@ -4,59 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e0562cd-5a1d-47b8-b2b2-0fe01757f967" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/API/PlantPredictionController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/SpringBootApp.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/pnpm-lock.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/App.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/index.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/main.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/vite-env.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/tsconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/vite.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dbnavigator.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/discord.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Flavia After IBCS-FS/Flavia After FS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Flavia After IBCS-FS/Flavia After FS.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Flavia After IBCS-FS/Flavia test data After FS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Flavia After IBCS-FS/Flavia test data After FS.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Flavia After IBCS-FS/Flavia train data After FS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Flavia After IBCS-FS/Flavia train data After FS.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Original Dataset/Flavia Leaf data.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Original Dataset/Flavia Leaf data.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Original Dataset/Flavia Leaf data.zip" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Original Dataset/Flavia Leaf data.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Original Dataset/Philippine Leaf data.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Original Dataset/Philippine Leaf data.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Original Dataset/Swedish Leaf data.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Original Dataset/Swedish Leaf data.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Philippine After IBCS-FS/Philippine After FS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Philippine After IBCS-FS/Philippine After FS.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Reedme First.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Reedme First.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Swedish After IBCS-FS/Swedish After FS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Swedish After IBCS-FS/Swedish After FS.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Swedish After IBCS-FS/Swedish test data After FS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Swedish After IBCS-FS/Swedish test data After FS.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Swedish After IBCS-FS/Swedish train data After FS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Swedish After IBCS-FS/Swedish train data After FS.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flavia_Plant_Model.ser" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Flavia_Plant_Model.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/backend/LICENSE" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Philippine_Plant_Model.ser" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Philippine_Plant_Model.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/backend/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Swedish_Plant_Model.ser" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Swedish_Plant_Model.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/WrapperCuckooSearchForFS/org/Discreeting/TransferFunction.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/Discreeting/TransferFunction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/WrapperCuckooSearchForFS/org/Evaluation/FitnessFunction.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/Evaluation/FitnessFunction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/WrapperCuckooSearchForFS/org/Main/MainClass_Bagging.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/Main/MainClass_Bagging.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/WrapperCuckooSearchForFS/org/Main/MainClass_CrossValidation.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/Main/MainClass_CrossValidation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/WrapperCuckooSearchForFS/org/Main/MainClass_For_FS_and_Bagging.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/Main/MainClass_For_FS_and_Bagging.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/WrapperCuckooSearchForFS/org/Optimizers/CuckooSearchOptimizer.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/Optimizers/CuckooSearchOptimizer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/WrapperCuckooSearchForFS/org/Discreeting/TransferFunction.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/WrapperCuckooSearchForFS/org/Discreeting/TransferFunction.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/WrapperCuckooSearchForFS/org/Evaluation/FitnessFunction.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/WrapperCuckooSearchForFS/org/Evaluation/FitnessFunction.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/WrapperCuckooSearchForFS/org/Main/MainClass_Bagging.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/WrapperCuckooSearchForFS/org/Main/MainClass_Bagging.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/WrapperCuckooSearchForFS/org/Main/MainClass_CrossValidation.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/WrapperCuckooSearchForFS/org/Main/MainClass_CrossValidation.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/WrapperCuckooSearchForFS/org/Main/MainClass_For_FS_and_Bagging.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/WrapperCuckooSearchForFS/org/Main/MainClass_For_FS_and_Bagging.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/WrapperCuckooSearchForFS/org/Optimizers/CuckooSearchOptimizer$CuckooSearchFeatureSet.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/WrapperCuckooSearchForFS/org/Optimizers/CuckooSearchOptimizer$CuckooSearchFeatureSet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/WrapperCuckooSearchForFS/org/Optimizers/CuckooSearchOptimizer.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/WrapperCuckooSearchForFS/org/Optimizers/CuckooSearchOptimizer.class" afterDir="false" />
-    </list>
+    <list default="true" id="8e0562cd-5a1d-47b8-b2b2-0fe01757f967" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
