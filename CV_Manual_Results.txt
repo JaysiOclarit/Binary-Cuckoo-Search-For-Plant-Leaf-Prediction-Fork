@@ -1,0 +1,110 @@
+Philippine Medicinal Plant Leaf Dataset
+=========================================
+Results for K = 3
+Duration: (00:20:53:178)
+Average Accuracy: 97.28370221327968%
+Average Recall: 97.09315167744194%
+Average F1-Score: 97.0755215958571%
+Average Precision: 97.25731701772577%
+=========================================
+
+=========================================
+Results for K = 5
+Duration: (00:40:55:392)
+Average Accuracy: 97.72025676480838%
+Average Recall: 97.62076183695008%
+Average F1-Score: 97.54654686715611%
+Average Precision: 97.65787276091068%
+=========================================
+
+=========================================
+Results for K = 7
+Duration: (01:01:35:098)
+Average Accuracy: 97.45137491616364%
+Average Recall: 97.33818731455287%
+Average F1-Score: 97.25964848992436%
+Average Precision: 97.46830855087708%
+=========================================
+
+=========================================
+Results for K = 9
+Duration: (01:19:43:788)
+Average Accuracy: 97.82089081401134%
+Average Recall: 97.7514252722586%
+Average F1-Score: 97.64160319617513%
+Average Precision: 97.81426135592804%
+=========================================
+
+Swedish Plant Leaf Dataset
+=========================================
+Results for K = 3
+Duration: (00:02:37:286)
+Average Accuracy: 96.0%
+Average Recall: 96.3035984196975%
+Average F1-Score: 96.00624328952773%
+Average Precision: 96.3230322691107%
+=========================================
+
+=========================================
+Results for K = 5
+Duration: (00:05:11:026)
+Average Accuracy: 96.44444444444446%
+Average Recall: 96.35950345950347%
+Average F1-Score: 96.29980976011039%
+Average Precision: 96.97350057350057%
+=========================================
+
+=========================================
+Results for K = 7
+Duration: (00:07:43:092)
+Average Accuracy: 96.73999754540993%
+Average Recall: 97.13337456194598%
+Average F1-Score: 96.830802561895%
+Average Precision: 97.23276987562703%
+=========================================
+
+=========================================
+Results for K = 9
+Duration: (00:10:03:190)
+Average Accuracy: 96.29629629629629%
+Average Recall: 96.63927636149859%
+Average F1-Score: 96.08617816460954%
+Average Precision: 96.37448559670781%
+=========================================
+Flavia Plant Leaf Dataset
+=========================================
+Results for K = 3
+Duration: (00:06:32:723)
+Average Accuracy: 97.37784740258255%
+Average Recall: 94.4439595197171%
+Average F1-Score: 94.38129393493216%
+Average Precision: 94.58671954485352%
+=========================================
+
+=========================================
+Results for K = 5
+Duration: (00:13:09:016)
+Average Accuracy: 97.81429556423811%
+Average Recall: 95.10986488259216%
+Average F1-Score: 94.92305653666129%
+Average Precision: 95.02713279986008%
+=========================================
+
+=========================================
+Results for K = 7
+Duration: (00:19:07:136)
+Average Accuracy: 97.46317949594922%
+Average Recall: 93.77975800053724%
+Average F1-Score: 93.31754836046984%
+Average Precision: 93.32521254599177%
+=========================================
+
+=========================================
+Results for K = 9
+Duration: (00:25:53:117)
+Average Accuracy: 98.0759241032371%
+Average Recall: 94.52461119127787%
+Average F1-Score: 94.2574071688748%
+Average Precision: 94.38469592509998%
+=========================================
+

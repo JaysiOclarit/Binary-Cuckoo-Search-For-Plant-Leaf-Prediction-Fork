@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8e0562cd-5a1d-47b8-b2b2-0fe01757f967" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/backend/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/API/PlantPredictionController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/SpringBootApp.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/pnpm-lock.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/App.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/index.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/main.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/vite-env.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/tsconfig.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/vite.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dbnavigator.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/discord.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Flavia After IBCS-FS/Flavia After FS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Flavia After IBCS-FS/Flavia After FS.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Flavia After IBCS-FS/Flavia test data After FS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Flavia After IBCS-FS/Flavia test data After FS.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Flavia After IBCS-FS/Flavia train data After FS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Flavia After IBCS-FS/Flavia train data After FS.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Original Dataset/Flavia Leaf data.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Original Dataset/Flavia Leaf data.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Original Dataset/Flavia Leaf data.zip" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Original Dataset/Flavia Leaf data.zip" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Original Dataset/Philippine Leaf data.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Original Dataset/Philippine Leaf data.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Original Dataset/Swedish Leaf data.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Original Dataset/Swedish Leaf data.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Philippine After IBCS-FS/Philippine After FS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Philippine After IBCS-FS/Philippine After FS.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Reedme First.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Reedme First.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Swedish After IBCS-FS/Swedish After FS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Swedish After IBCS-FS/Swedish After FS.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Swedish After IBCS-FS/Swedish test data After FS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Swedish After IBCS-FS/Swedish test data After FS.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Entire Data Folder/Swedish After IBCS-FS/Swedish train data After FS.csv" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Entire Data Folder/Swedish After IBCS-FS/Swedish train data After FS.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Flavia_Plant_Model.ser" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Flavia_Plant_Model.ser" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/backend/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Philippine_Plant_Model.ser" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Philippine_Plant_Model.ser" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/backend/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Swedish_Plant_Model.ser" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Swedish_Plant_Model.ser" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/WrapperCuckooSearchForFS/org/Discreeting/TransferFunction.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/Discreeting/TransferFunction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/WrapperCuckooSearchForFS/org/Evaluation/FitnessFunction.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/Evaluation/FitnessFunction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/WrapperCuckooSearchForFS/org/Main/MainClass_Bagging.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/Main/MainClass_Bagging.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/WrapperCuckooSearchForFS/org/Main/MainClass_CrossValidation.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/Main/MainClass_CrossValidation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/WrapperCuckooSearchForFS/org/Main/MainClass_For_FS_and_Bagging.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/Main/MainClass_For_FS_and_Bagging.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/WrapperCuckooSearchForFS/org/Optimizers/CuckooSearchOptimizer.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/WrapperCuckooSearchForFS/org/Optimizers/CuckooSearchOptimizer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/WrapperCuckooSearchForFS/org/Discreeting/TransferFunction.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/WrapperCuckooSearchForFS/org/Discreeting/TransferFunction.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/WrapperCuckooSearchForFS/org/Evaluation/FitnessFunction.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/WrapperCuckooSearchForFS/org/Evaluation/FitnessFunction.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/WrapperCuckooSearchForFS/org/Main/MainClass_Bagging.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/WrapperCuckooSearchForFS/org/Main/MainClass_Bagging.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/WrapperCuckooSearchForFS/org/Main/MainClass_CrossValidation.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/WrapperCuckooSearchForFS/org/Main/MainClass_CrossValidation.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/WrapperCuckooSearchForFS/org/Main/MainClass_For_FS_and_Bagging.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/WrapperCuckooSearchForFS/org/Main/MainClass_For_FS_and_Bagging.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/WrapperCuckooSearchForFS/org/Optimizers/CuckooSearchOptimizer$CuckooSearchFeatureSet.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/WrapperCuckooSearchForFS/org/Optimizers/CuckooSearchOptimizer$CuckooSearchFeatureSet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/WrapperCuckooSearchForFS/org/Optimizers/CuckooSearchOptimizer.class" beforeDir="false" afterPath="$PROJECT_DIR$/backend/target/classes/WrapperCuckooSearchForFS/org/Optimizers/CuckooSearchOptimizer.class" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DBNavigator.Project.Workspace.Settings">
+    <assistant-settings>
+      <credential-settings>
+        <credentials />
+      </credential-settings>
+      <profile-settings>
+        <profiles />
+      </profile-settings>
+      <mcp-server-settings>
+        <workspace-integration value="false" />
+        <mcp-servers />
+        <mcp-tool-approvals />
+      </mcp-server-settings>
+    </assistant-settings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="3H8iEcizfddlV4zBVNG2zuNE0lF" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.MainClass_Bagging.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainClass_CrossValidation.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainClass_For_FS_and_Bagging.executor&quot;: &quot;Run&quot;,
+    &quot;Application.SpringBootApp.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\janch\IdeaProjects\Binary-Cuckoo-Search-For-Plant-Leaf-Prediction\backend" />
+      <recent name="C:\Users\janch\IdeaProjects\Binary-Cuckoo-Search-For-Plant-Leaf-Prediction\backend\Entire Data Folder\Swedish After IBCS-FS" />
+      <recent name="C:\Users\janch\IdeaProjects\Binary-Cuckoo-Search-For-Plant-Leaf-Prediction\backend\Entire Data Folder\Flavia After IBCS-FS" />
+      <recent name="C:\Users\janch\IdeaProjects\Binary-Cuckoo-Search-For-Plant-Leaf-Prediction\backend\Entire Data Folder\Philippine After IBCS-FS" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.MainClass_CrossValidation">
+    <configuration name="MainClass_Bagging" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="WrapperCuckooSearchForFS.org.Main.MainClass_Bagging" />
+      <module name="FeatureSelection_BlackHole_Optimizer" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="WrapperCuckooSearchForFS.org.Main.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MainClass_CrossValidation" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="WrapperCuckooSearchForFS.org.Main.MainClass_CrossValidation" />
+      <module name="FeatureSelection_BlackHole_Optimizer" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="WrapperCuckooSearchForFS.org.Main.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MainClass_For_FS_and_Bagging" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="WrapperCuckooSearchForFS.org.Main.MainClass_For_FS_and_Bagging" />
+      <module name="FeatureSelection_BlackHole_Optimizer" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="WrapperCuckooSearchForFS.org.Main.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SpringBootApp" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="WrapperCuckooSearchForFS.org.SpringBootApp" />
+      <module name="FeatureSelection_BlackHole_Optimizer" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="WrapperCuckooSearchForFS.org.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.MainClass_CrossValidation" />
+        <item itemvalue="Application.MainClass_Bagging" />
+        <item itemvalue="Application.MainClass_For_FS_and_Bagging" />
+        <item itemvalue="Application.SpringBootApp" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8e0562cd-5a1d-47b8-b2b2-0fe01757f967" name="Changes" comment="" />
+      <created>1785255986780</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1785255986780</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
