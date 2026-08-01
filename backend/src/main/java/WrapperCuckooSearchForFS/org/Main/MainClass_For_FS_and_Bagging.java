@@ -64,14 +64,19 @@ public class MainClass_For_FS_and_Bagging {
                         var eDate = System.currentTimeMillis();
                         var SFDS = new SelectedFeatureDataset<>(trainData, SFS);
 
-                        // Export per-dataset convergence history
-                        String csvConvergencePath = datasetPrefix + "_BCS_Convergence_History.csv";
-                        optimizer.exportConvergenceCSV(csvConvergencePath);
+                        // Ensure target folder exists inside Entire Data Folder/
+                        java.io.File targetDir = Paths.get("Entire Data Folder", datasetPrefix + " After FS").toFile();
+                        if (!targetDir.exists()) {
+                                targetDir.mkdirs();
+                        }
 
-                        // Save feature-selected dataset CSV (e.g., "Swedish After FS.csv")
+                        // Export per-dataset convergence history inside target folder
                         String outputCsvName = datasetPrefix + " After FS.csv";
-                        java.nio.file.Path outputPath = Paths.get(System.getProperty("user.dir"), outputCsvName);
+                        java.nio.file.Path outputPath = targetDir.toPath().resolve(outputCsvName);
                         new CSVSaver().save(outputPath, SFDS, "Class");
+
+                        String csvConvergencePath = targetDir.toPath().resolve(datasetPrefix + "_BCS_Convergence_History.csv").toString();
+                        optimizer.exportConvergenceCSV(csvConvergencePath);
 
                         double reductionRatio = (1.0 - ((double) SFDS.size() / trainData.getFeatureMap().size())) * 100.0;
                         int optIter = optimizer.getOptimalConvergenceIteration();

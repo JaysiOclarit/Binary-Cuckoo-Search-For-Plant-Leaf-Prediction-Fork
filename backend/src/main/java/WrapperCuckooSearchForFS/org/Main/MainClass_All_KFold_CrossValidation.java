@@ -59,23 +59,29 @@ public class MainClass_All_KFold_CrossValidation {
         // 2. Define list of dataset tasks to evaluate (ONLY Feature-Selected Datasets)
         List<DatasetTask> tasks = new ArrayList<>();
 
-        // Proposed GBCS Feature-Selected Datasets (Root and Subfolder variants)
+        // Proposed GBCS Feature-Selected Datasets (Subfolders & Root)
+        addIfFileExists(tasks, "Swedish", "Proposed_GBCS", Paths.get("Entire Data Folder", "Swedish After GBCS-FS", "Swedish After GBCS-FS.csv").toString());
+        addIfFileExists(tasks, "Flavia", "Proposed_GBCS", Paths.get("Entire Data Folder", "Flavia After GBCS-FS", "Flavia After GBCS-FS.csv").toString());
+        addIfFileExists(tasks, "Philippine", "Proposed_GBCS", Paths.get("Entire Data Folder", "Philippine After GBCS-FS", "Philippine After GBCS-FS.csv").toString());
         addIfFileExists(tasks, "Swedish", "Proposed_GBCS", "Swedish After GBCS-FS.csv");
         addIfFileExists(tasks, "Flavia", "Proposed_GBCS", "Flavia After GBCS-FS.csv");
         addIfFileExists(tasks, "Philippine", "Proposed_GBCS", "Philippine After GBCS-FS.csv");
 
-        // Baseline BCS Feature-Selected Datasets (Root and Subfolder variants)
+        // Baseline BCS Feature-Selected Datasets (Subfolders & Root)
+        addIfFileExists(tasks, "Swedish", "Baseline_BCS", Paths.get("Entire Data Folder", "Swedish After FS", "Swedish After FS.csv").toString());
+        addIfFileExists(tasks, "Flavia", "Baseline_BCS", Paths.get("Entire Data Folder", "Flavia After FS", "Flavia After FS.csv").toString());
+        addIfFileExists(tasks, "Philippine", "Baseline_BCS", Paths.get("Entire Data Folder", "Philippine After FS", "Philippine After FS.csv").toString());
         addIfFileExists(tasks, "Swedish", "Baseline_BCS", "Swedish After FS.csv");
+        addIfFileExists(tasks, "Flavia", "Baseline_BCS", "Flavia After FS.csv");
+        addIfFileExists(tasks, "Philippine", "Baseline_BCS", "Philippine After FS.csv");
+
+        // Legacy Subfolder Fallbacks
         addIfFileExists(tasks, "Swedish", "Baseline_BCS", Paths.get("Entire Data Folder", "Swedish After IBCS-FS", "Swedish train data After FS.csv").toString());
         addIfFileExists(tasks, "Swedish", "Baseline_BCS", Paths.get("Entire Data Folder", "Swedish After IBCS-FS", "Swedish After FS(2).csv").toString());
         addIfFileExists(tasks, "Swedish", "Baseline_BCS", Paths.get("Entire Data Folder", "Swedish After IBCS-FS", "Swedish After FS.csv").toString());
-
-        addIfFileExists(tasks, "Flavia", "Baseline_BCS", "Flavia After FS.csv");
         addIfFileExists(tasks, "Flavia", "Baseline_BCS", Paths.get("Entire Data Folder", "Flavia After IBCS-FS", "Flavia train data After FS.csv").toString());
         addIfFileExists(tasks, "Flavia", "Baseline_BCS", Paths.get("Entire Data Folder", "Flavia After IBCS-FS", "Flavia After FS(2).csv").toString());
         addIfFileExists(tasks, "Flavia", "Baseline_BCS", Paths.get("Entire Data Folder", "Flavia After IBCS-FS", "Flavia After FS.csv").toString());
-
-        addIfFileExists(tasks, "Philippine", "Baseline_BCS", "Philippine After FS.csv");
         addIfFileExists(tasks, "Philippine", "Baseline_BCS", Paths.get("Entire Data Folder", "Philippine After IBCS-FS", "Philippine After FS(2).csv").toString());
         addIfFileExists(tasks, "Philippine", "Baseline_BCS", Paths.get("Entire Data Folder", "Philippine After IBCS-FS", "Philippine train data After FS.csv").toString());
         addIfFileExists(tasks, "Philippine", "Baseline_BCS", Paths.get("Entire Data Folder", "Philippine After IBCS-FS", "Philippine After FS.csv").toString());
@@ -172,8 +178,17 @@ public class MainClass_All_KFold_CrossValidation {
 
     private static void addIfFileExists(List<DatasetTask> tasks, String datasetName, String algorithmName,
             String filePath) {
+        if (filePath.toLowerCase().contains("train data") || filePath.toLowerCase().contains("test data")) {
+            return; // Exclude partial train/test dataset files
+        }
         File file = new File(filePath);
         if (file.exists() && !file.isDirectory()) {
+            // Avoid adding duplicates for the same dataset and algorithm
+            for (DatasetTask task : tasks) {
+                if (task.datasetName().equalsIgnoreCase(datasetName) && task.algorithmName().equalsIgnoreCase(algorithmName)) {
+                    return;
+                }
+            }
             tasks.add(new DatasetTask(datasetName, algorithmName, filePath));
         }
     }

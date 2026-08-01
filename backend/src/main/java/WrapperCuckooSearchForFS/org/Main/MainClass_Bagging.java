@@ -17,49 +17,84 @@ import java.nio.file.Paths;
 
 public class MainClass_Bagging {
     public static void main(String[] args) throws IOException {
-        // read the entire dataset after the FS process
-        var dataPath = Paths.get("Entire Data Folder", "Philippine After IBCS-FS", "Philippine After FS(2).csv").toString();
-        var dataSource = new CSVLoader<>(new LabelFactory()).loadDataSource(Paths.get(dataPath), "Class");
-        var Data = new MutableDataset<>(dataSource);
+        System.out.println("=================================================================");
+        System.out.println("   BATCH BAGGING ENSEMBLE MODEL TRAINER (BASELINE BCS)           ");
+        System.out.println("=================================================================\n");
 
-        // use FM classifier
-        var FMTrainer = new FMClassificationTrainer(new Hinge(),
-                new AdaGrad(0.1, 0.5),
-                50,
-                Trainer.DEFAULT_SEED,
-                10,
-                0.2D);
+        // List of candidate Baseline BCS feature-selected dataset paths (Excludes partial train/test splits)
+        String[][] datasetConfigs = {
+            {"Swedish", "Entire Data Folder/Swedish After FS/Swedish After FS.csv", "Swedish After FS.csv"},
+            {"Flavia", "Entire Data Folder/Flavia After FS/Flavia After FS.csv", "Flavia After FS.csv"},
+            {"Philippine", "Entire Data Folder/Philippine After FS/Philippine After FS.csv", "Philippine After FS.csv"}
+        };
 
-        // use bagging for ensimple learning
-        var trainer = new BaggingTrainer<>(FMTrainer,
-                new VotingCombiner(),
-                10,
-                Trainer.DEFAULT_SEED);
+        for (String[] config : datasetConfigs) {
+            String datasetName = config[0];
+            java.io.File resolvedFile = null;
 
-        // train the model
-        var sTrain = System.currentTimeMillis();
-        var ensembleLearningTrainer = trainer.train(Data);
-        var eTrain = System.currentTimeMillis();
+            for (int i = 1; i < config.length; i++) {
+                java.io.File candidate = new java.io.File(config[i]);
+                if (candidate.exists() && !candidate.isDirectory()) {
+                    resolvedFile = candidate;
+                    break;
+                }
+            }
 
-        // ---------------------------------------------------------
-        // NEW CODE: Save the fully trained model to your hard drive
-        // ---------------------------------------------------------
-        System.out.println("Saving model to disk...");
-        try (java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(new java.io.FileOutputStream("Philippine_Plant_Model.ser"))) {
-            oos.writeObject(ensembleLearningTrainer);
-            System.out.println("Success! Model saved as 'Philippine_Plant_Model.ser' in your project root.");
-        } catch (java.io.IOException e) {
-            System.err.println("Error saving the model: " + e.getMessage());
+            if (resolvedFile == null) {
+                System.out.println("SKIP: No feature-selected dataset found for " + datasetName + " (Baseline BCS).");
+                continue;
+            }
+
+            System.out.println("-----------------------------------------------------------------");
+            System.out.println("Training Baseline BCS Model for: " + datasetName);
+            System.out.println("Path: " + resolvedFile.getAbsolutePath());
+
+            var dataSource = new CSVLoader<>(new LabelFactory()).loadDataSource(resolvedFile.toPath(), "Class");
+            var dataset = new MutableDataset<>(dataSource);
+
+            // Configure FM Trainer
+            var fmTrainer = new FMClassificationTrainer(
+                    new Hinge(),
+                    new AdaGrad(0.1, 0.5),
+                    50,
+                    Trainer.DEFAULT_SEED,
+                    10,
+                    0.2D
+            );
+
+            // Configure Bagging Trainer (10 weak learners)
+            var baggingTrainer = new BaggingTrainer<>(
+                    fmTrainer,
+                    new VotingCombiner(),
+                    10,
+                    Trainer.DEFAULT_SEED
+            );
+
+            var sTrain = System.currentTimeMillis();
+            var trainedModel = baggingTrainer.train(dataset);
+            var eTrain = System.currentTimeMillis();
+
+            // Save trained model (e.g., "Swedish_Plant_Model_bcs.ser")
+            String outputModelName = datasetName + "_Plant_Model_bcs.ser";
+            System.out.println("Saving model to: " + outputModelName);
+            try (java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(new java.io.FileOutputStream(outputModelName))) {
+                oos.writeObject(trainedModel);
+                System.out.println("SUCCESS: Model saved as '" + outputModelName + "' in project root.");
+            } catch (java.io.IOException e) {
+                System.err.println("Error saving model: " + e.getMessage());
+            }
+
+            var evaluator = new LabelEvaluator().evaluate(trainedModel, dataset);
+            System.out.println("\nRESULTS for " + datasetName + " (Baseline BCS Bagging):");
+            System.out.println("  Training Duration: " + Util.formatDuration(sTrain, eTrain));
+            System.out.printf("  Accuracy: %.2f%%\n", evaluator.accuracy() * 100.0);
+            System.out.printf("  Macro Recall: %.2f%%\n", evaluator.macroAveragedRecall() * 100.0);
+            System.out.printf("  Macro Precision: %.2f%%\n", evaluator.macroAveragedPrecision() * 100.0);
+            System.out.printf("  Macro F1-Score: %.2f%%\n", evaluator.macroAveragedF1() * 100.0);
         }
-        // ---------------------------------------------------------
 
-        // define evaluater to test the model to get the output
-        var labelEvaluator = new LabelEvaluator().evaluate(ensembleLearningTrainer, Data);
-
-        System.out.println("The Training_Testing duration time is : " + Util.formatDuration(sTrain, eTrain));
-        System.out.println("The average accuracy is : " + labelEvaluator.accuracy());
-        System.out.println("The average recall is : " + labelEvaluator.macroAveragedRecall());
-        System.out.println("The average F1-Score is : " + labelEvaluator.macroAveragedF1());
-        System.out.println("The average precision is : " + labelEvaluator.macroAveragedPrecision());
+        System.out.println("\n=================================================================");
+        System.out.println("SUCCESS: All Baseline BCS models trained and saved!");
+        System.out.println("=================================================================");
     }
 }
