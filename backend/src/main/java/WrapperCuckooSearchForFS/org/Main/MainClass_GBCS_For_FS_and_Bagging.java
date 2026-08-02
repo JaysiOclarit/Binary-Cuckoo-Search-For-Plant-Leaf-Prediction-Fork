@@ -106,19 +106,19 @@ public class MainClass_GBCS_For_FS_and_Bagging {
                                         .resolve(datasetPrefix + "_GBCS_Convergence_History.csv").toString();
                         optimizer.exportConvergenceCSV(csvConvergencePath);
 
-                        double reductionRatio = (1.0
-                                        - ((double) selectedFeatureDataset.size() / trainData.getFeatureMap().size()))
-                                        * 100.0;
+                        int origFeatureCount = trainData.getFeatureMap().size();
+                        int selFeatureCount = selectedFeatureDataset.getFeatureMap().size();
+                        double reductionRatio = (1.0 - ((double) selFeatureCount / origFeatureCount)) * 100.0;
                         int optIter = optimizer.getOptimalConvergenceIteration();
                         String durationStr = Util.formatDuration(sDate, eDate);
 
-                        summaryList.add(new GBCSFSSummary(datasetPrefix, trainData.getFeatureMap().size(), selectedFeatureDataset.size(), reductionRatio, durationStr));
+                        summaryList.add(new GBCSFSSummary(datasetPrefix, origFeatureCount, selFeatureCount, reductionRatio, durationStr));
 
                         System.out.println("\nRESULTS for " + datasetPrefix + " (GBCS):");
                         System.out.printf("  FS Duration: %s\n", durationStr);
                         System.out.printf("  Optimal Convergence Iteration: Iteration %d (out of 20)\n", optIter);
-                        System.out.printf("  Original Feature Count: %d\n", trainData.getFeatureMap().size());
-                        System.out.printf("  Selected Feature Count: %d\n", selectedFeatureDataset.size());
+                        System.out.printf("  Original Feature Count: %d\n", origFeatureCount);
+                        System.out.printf("  Selected Feature Count: %d\n", selFeatureCount);
                         System.out.printf("  Feature Reduction Ratio (FRR): %.2f%%\n", reductionRatio);
                         System.out.println("  Saved Dataset To: " + outputPath);
                         System.out.println("  Saved Convergence To: " + csvConvergencePath);

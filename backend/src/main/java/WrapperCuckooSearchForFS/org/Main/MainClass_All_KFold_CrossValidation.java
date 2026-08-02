@@ -63,6 +63,9 @@ public class MainClass_All_KFold_CrossValidation {
         addIfFileExists(tasks, "Swedish", "Proposed_GBCS", Paths.get("Entire Data Folder", "Swedish After GBCS-FS", "Swedish After GBCS-FS.csv").toString());
         addIfFileExists(tasks, "Flavia", "Proposed_GBCS", Paths.get("Entire Data Folder", "Flavia After GBCS-FS", "Flavia After GBCS-FS.csv").toString());
         addIfFileExists(tasks, "Philippine", "Proposed_GBCS", Paths.get("Entire Data Folder", "Philippine After GBCS-FS", "Philippine After GBCS-FS.csv").toString());
+        addIfFileExists(tasks, "Swedish", "Proposed_GBCS", Paths.get("backend", "Entire Data Folder", "Swedish After GBCS-FS", "Swedish After GBCS-FS.csv").toString());
+        addIfFileExists(tasks, "Flavia", "Proposed_GBCS", Paths.get("backend", "Entire Data Folder", "Flavia After GBCS-FS", "Flavia After GBCS-FS.csv").toString());
+        addIfFileExists(tasks, "Philippine", "Proposed_GBCS", Paths.get("backend", "Entire Data Folder", "Philippine After GBCS-FS", "Philippine After GBCS-FS.csv").toString());
         addIfFileExists(tasks, "Swedish", "Proposed_GBCS", "Swedish After GBCS-FS.csv");
         addIfFileExists(tasks, "Flavia", "Proposed_GBCS", "Flavia After GBCS-FS.csv");
         addIfFileExists(tasks, "Philippine", "Proposed_GBCS", "Philippine After GBCS-FS.csv");
@@ -71,6 +74,9 @@ public class MainClass_All_KFold_CrossValidation {
         addIfFileExists(tasks, "Swedish", "Baseline_BCS", Paths.get("Entire Data Folder", "Swedish After FS", "Swedish After FS.csv").toString());
         addIfFileExists(tasks, "Flavia", "Baseline_BCS", Paths.get("Entire Data Folder", "Flavia After FS", "Flavia After FS.csv").toString());
         addIfFileExists(tasks, "Philippine", "Baseline_BCS", Paths.get("Entire Data Folder", "Philippine After FS", "Philippine After FS.csv").toString());
+        addIfFileExists(tasks, "Swedish", "Baseline_BCS", Paths.get("backend", "Entire Data Folder", "Swedish After FS", "Swedish After FS.csv").toString());
+        addIfFileExists(tasks, "Flavia", "Baseline_BCS", Paths.get("backend", "Entire Data Folder", "Flavia After FS", "Flavia After FS.csv").toString());
+        addIfFileExists(tasks, "Philippine", "Baseline_BCS", Paths.get("backend", "Entire Data Folder", "Philippine After FS", "Philippine After FS.csv").toString());
         addIfFileExists(tasks, "Swedish", "Baseline_BCS", "Swedish After FS.csv");
         addIfFileExists(tasks, "Flavia", "Baseline_BCS", "Flavia After FS.csv");
         addIfFileExists(tasks, "Philippine", "Baseline_BCS", "Philippine After FS.csv");
@@ -162,11 +168,24 @@ public class MainClass_All_KFold_CrossValidation {
             }
         }
 
-        // 5. Save all results to CSV File
+        // 5. Print Final Batch K-Fold Cross-Validation Summary Table
+        System.out.println("\n=========================================================================================");
+        System.out.println("   FINAL BATCH K-FOLD CROSS-VALIDATION SUMMARY TABLE");
+        System.out.println("=========================================================================================");
+        System.out.printf("%-12s | %-15s | %-7s | %-10s | %-10s | %-10s | %-10s | %-15s\n",
+                "Dataset", "Algorithm", "K-Folds", "Acc (%)", "Recall (%)", "Prec (%)", "F1 (%)", "Duration");
+        System.out.println("-----------------------------------------------------------------------------------------");
+        for (KFoldResult r : allResults) {
+            System.out.printf("%-12s | %-15s | K=%-5d | %-10.2f | %-10.2f | %-10.2f | %-10.2f | %-15s\n",
+                    r.datasetName(), r.algorithmName(), r.kFolds(), r.accuracy(), r.recall(), r.precision(), r.f1Score(), r.duration());
+        }
+        System.out.println("=========================================================================================");
+
+        // 6. Save all results to CSV File
         String csvFileName = "All_KFold_CrossValidation_Results.csv";
         exportToCSV(csvFileName, allResults);
 
-        // 6. Append to CV_Manual_Results.txt text log
+        // 7. Append to CV_Manual_Results.txt text log
         exportToTextLog("CV_Manual_Results.txt", allResults);
 
         System.out.println("\n=================================================================");

@@ -1,0 +1,196 @@
+
+=========================================================
+AUTOMATED BATCH K-FOLD CROSS-VALIDATION RESULTS SUMMARY
+=========================================================
+Dataset: Swedish | Algorithm: Proposed_GBCS
+Results for K = 3
+Duration: (00:02:18:868)
+Average Accuracy: 95.8519%
+Average Recall: 96.1349%
+Average F1-Score: 95.9369%
+Average Precision: 96.2894%
+---------------------------------------------------------
+Dataset: Swedish | Algorithm: Proposed_GBCS
+Results for K = 5
+Duration: (00:04:35:361)
+Average Accuracy: 96.2963%
+Average Recall: 96.0939%
+Average F1-Score: 95.8594%
+Average Precision: 96.0782%
+---------------------------------------------------------
+Dataset: Swedish | Algorithm: Proposed_GBCS
+Results for K = 7
+Duration: (00:06:50:475)
+Average Accuracy: 97.0361%
+Average Recall: 97.2067%
+Average F1-Score: 97.0269%
+Average Precision: 97.3427%
+---------------------------------------------------------
+Dataset: Swedish | Algorithm: Proposed_GBCS
+Results for K = 9
+Duration: (00:09:05:486)
+Average Accuracy: 96.8889%
+Average Recall: 97.1022%
+Average F1-Score: 96.6327%
+Average Precision: 96.9153%
+---------------------------------------------------------
+Dataset: Flavia | Algorithm: Proposed_GBCS
+Results for K = 3
+Duration: (00:08:32:711)
+Average Accuracy: 96.6782%
+Average Recall: 93.4285%
+Average F1-Score: 93.4048%
+Average Precision: 93.9141%
+---------------------------------------------------------
+Dataset: Flavia | Algorithm: Proposed_GBCS
+Results for K = 5
+Duration: (00:16:52:505)
+Average Accuracy: 97.2029%
+Average Recall: 94.4282%
+Average F1-Score: 94.2686%
+Average Precision: 94.4889%
+---------------------------------------------------------
+Dataset: Flavia | Algorithm: Proposed_GBCS
+Results for K = 7
+Duration: (00:25:00:111)
+Average Accuracy: 97.9019%
+Average Recall: 94.0814%
+Average F1-Score: 93.9652%
+Average Precision: 94.3790%
+---------------------------------------------------------
+Dataset: Flavia | Algorithm: Proposed_GBCS
+Results for K = 9
+Duration: (00:33:07:843)
+Average Accuracy: 97.6392%
+Average Recall: 93.7577%
+Average F1-Score: 93.4232%
+Average Precision: 93.9062%
+---------------------------------------------------------
+Dataset: Philippine | Algorithm: Proposed_GBCS
+Results for K = 3
+Duration: (00:26:51:996)
+Average Accuracy: 97.1160%
+Average Recall: 96.8905%
+Average F1-Score: 96.9240%
+Average Precision: 97.1755%
+---------------------------------------------------------
+Dataset: Philippine | Algorithm: Proposed_GBCS
+Results for K = 5
+Duration: (00:54:09:152)
+Average Accuracy: 97.5524%
+Average Recall: 97.4430%
+Average F1-Score: 97.4456%
+Average Precision: 97.6665%
+---------------------------------------------------------
+Dataset: Philippine | Algorithm: Proposed_GBCS
+Results for K = 7
+Duration: (01:20:44:788)
+Average Accuracy: 97.6526%
+Average Recall: 97.5378%
+Average F1-Score: 97.4625%
+Average Precision: 97.6975%
+---------------------------------------------------------
+Dataset: Philippine | Algorithm: Proposed_GBCS
+Results for K = 9
+Duration: (01:47:59:087)
+Average Accuracy: 97.9213%
+Average Recall: 97.9373%
+Average F1-Score: 97.8138%
+Average Precision: 98.0089%
+---------------------------------------------------------
+Dataset: Swedish | Algorithm: Baseline_BCS
+Results for K = 3
+Duration: (00:01:42:582)
+Average Accuracy: 95.5556%
+Average Recall: 95.9219%
+Average F1-Score: 95.6264%
+Average Precision: 95.9283%
+---------------------------------------------------------
+Dataset: Swedish | Algorithm: Baseline_BCS
+Results for K = 5
+Duration: (00:03:24:978)
+Average Accuracy: 95.8519%
+Average Recall: 95.8088%
+Average F1-Score: 95.5700%
+Average Precision: 96.1163%
+---------------------------------------------------------
+Dataset: Swedish | Algorithm: Baseline_BCS
+Results for K = 7
+Duration: (00:05:07:298)
+Average Accuracy: 96.2951%
+Average Recall: 96.6315%
+Average F1-Score: 96.3011%
+Average Precision: 96.9603%
+---------------------------------------------------------
+Dataset: Swedish | Algorithm: Baseline_BCS
+Results for K = 9
+Duration: (00:06:46:984)
+Average Accuracy: 96.2963%
+Average Recall: 96.4526%
+Average F1-Score: 96.0362%
+Average Precision: 96.6611%
+---------------------------------------------------------
+Dataset: Flavia | Algorithm: Baseline_BCS
+Results for K = 3
+Duration: (00:06:19:263)
+Average Accuracy: 97.3772%
+Average Recall: 94.4492%
+Average F1-Score: 94.4017%
+Average Precision: 94.5987%
+---------------------------------------------------------
+Dataset: Flavia | Algorithm: Baseline_BCS
+Results for K = 5
+Duration: (00:12:37:350)
+Average Accuracy: 97.7270%
+Average Recall: 94.8775%
+Average F1-Score: 94.8192%
+Average Precision: 95.1029%
+---------------------------------------------------------
+Dataset: Flavia | Algorithm: Baseline_BCS
+Results for K = 7
+Duration: (00:18:47:699)
+Average Accuracy: 97.8121%
+Average Recall: 94.2752%
+Average F1-Score: 93.8679%
+Average Precision: 93.9669%
+---------------------------------------------------------
+Dataset: Flavia | Algorithm: Baseline_BCS
+Results for K = 9
+Duration: (00:25:03:465)
+Average Accuracy: 97.1135%
+Average Recall: 93.4397%
+Average F1-Score: 92.9256%
+Average Precision: 93.1754%
+---------------------------------------------------------
+Dataset: Philippine | Algorithm: Baseline_BCS
+Results for K = 3
+Duration: (00:20:32:073)
+Average Accuracy: 96.9148%
+Average Recall: 96.7120%
+Average F1-Score: 96.7364%
+Average Precision: 96.9523%
+---------------------------------------------------------
+Dataset: Philippine | Algorithm: Baseline_BCS
+Results for K = 5
+Duration: (00:41:15:866)
+Average Accuracy: 97.3850%
+Average Recall: 97.2886%
+Average F1-Score: 97.1910%
+Average Precision: 97.3580%
+---------------------------------------------------------
+Dataset: Philippine | Algorithm: Baseline_BCS
+Results for K = 7
+Duration: (01:01:57:335)
+Average Accuracy: 97.7867%
+Average Recall: 97.6038%
+Average F1-Score: 97.5208%
+Average Precision: 97.7989%
+---------------------------------------------------------
+Dataset: Philippine | Algorithm: Baseline_BCS
+Results for K = 9
+Duration: (01:22:54:396)
+Average Accuracy: 97.6870%
+Average Recall: 97.6417%
+Average F1-Score: 97.5517%
+Average Precision: 97.8002%
+---------------------------------------------------------

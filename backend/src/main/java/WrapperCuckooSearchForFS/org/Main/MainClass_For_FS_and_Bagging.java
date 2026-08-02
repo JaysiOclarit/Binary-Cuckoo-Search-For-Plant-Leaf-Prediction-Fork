@@ -85,18 +85,19 @@ public class MainClass_For_FS_and_Bagging {
                                         .resolve(datasetPrefix + "_BCS_Convergence_History.csv").toString();
                         optimizer.exportConvergenceCSV(csvConvergencePath);
 
-                        double reductionRatio = (1.0 - ((double) SFDS.size() / trainData.getFeatureMap().size()))
-                                        * 100.0;
+                        int origFeatureCount = trainData.getFeatureMap().size();
+                        int selFeatureCount = SFDS.getFeatureMap().size();
+                        double reductionRatio = (1.0 - ((double) selFeatureCount / origFeatureCount)) * 100.0;
                         int optIter = optimizer.getOptimalConvergenceIteration();
                         String durationStr = Util.formatDuration(sDate, eDate);
 
-                        summaryList.add(new FSSummary(datasetPrefix, trainData.getFeatureMap().size(), SFDS.size(), reductionRatio, durationStr));
+                        summaryList.add(new FSSummary(datasetPrefix, origFeatureCount, selFeatureCount, reductionRatio, durationStr));
 
                         System.out.println("\nRESULTS for " + datasetPrefix + " (BCS):");
                         System.out.printf("  FS Duration: %s\n", durationStr);
                         System.out.printf("  Optimal Convergence Iteration: Iteration %d (out of 20)\n", optIter);
-                        System.out.printf("  Original Feature Count: %d\n", trainData.getFeatureMap().size());
-                        System.out.printf("  Selected Feature Count: %d\n", SFDS.size());
+                        System.out.printf("  Original Feature Count: %d\n", origFeatureCount);
+                        System.out.printf("  Selected Feature Count: %d\n", selFeatureCount);
                         System.out.printf("  Feature Reduction Ratio (FRR): %.2f%%\n", reductionRatio);
                         System.out.println("  Saved Dataset To: " + outputPath);
                         System.out.println("  Saved Convergence To: " + csvConvergencePath);

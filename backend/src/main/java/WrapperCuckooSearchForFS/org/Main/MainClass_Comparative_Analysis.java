@@ -96,12 +96,13 @@ public class MainClass_Comparative_Analysis {
         var bcsModel = baggingTrainer.train(bcsTrainSFDS);
         var bcsEval = new LabelEvaluator().evaluate(bcsModel, bcsTestSFDS);
 
+        int bcsSelCount = bcsTrainSFDS.getFeatureMap().size();
         AlgorithmResult bcsResult = new AlgorithmResult(
                 "Baseline BCS",
                 (bcsEnd - bcsStart),
                 totalOriginalFeatures,
-                bcsTrainSFDS.size(),
-                (1.0 - ((double) bcsTrainSFDS.size() / totalOriginalFeatures)) * 100.0,
+                bcsSelCount,
+                (1.0 - ((double) bcsSelCount / totalOriginalFeatures)) * 100.0,
                 bcsAvgCorr,
                 bcsOptIter,
                 bcsEval.accuracy() * 100.0,
@@ -133,12 +134,13 @@ public class MainClass_Comparative_Analysis {
         var gbcsModel = baggingTrainer.train(gbcsTrainSFDS);
         var gbcsEval = new LabelEvaluator().evaluate(gbcsModel, gbcsTestSFDS);
 
+        int gbcsSelCount = gbcsTrainSFDS.getFeatureMap().size();
         AlgorithmResult gbcsResult = new AlgorithmResult(
                 "Proposed GBCS",
                 (gbcsEnd - gbcsStart),
                 totalOriginalFeatures,
-                gbcsTrainSFDS.size(),
-                (1.0 - ((double) gbcsTrainSFDS.size() / totalOriginalFeatures)) * 100.0,
+                gbcsSelCount,
+                (1.0 - ((double) gbcsSelCount / totalOriginalFeatures)) * 100.0,
                 gbcsAvgCorr,
                 gbcsOptIter,
                 gbcsEval.accuracy() * 100.0,
