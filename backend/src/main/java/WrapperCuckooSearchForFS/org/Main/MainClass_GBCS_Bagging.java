@@ -18,8 +18,10 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Paths;
 
 /**
- * Trains and saves the final Factorization Machine (FM) + Bagging Ensemble Model 
- * built on features selected by the Proposed Genetic Binary Cuckoo Search (GBCS).
+ * Trains and saves the final Factorization Machine (FM) + Bagging Ensemble
+ * Model
+ * built on features selected by the Proposed Genetic Binary Cuckoo Search
+ * (GBCS).
  */
 public class MainClass_GBCS_Bagging {
     public static void main(String[] args) throws IOException {
@@ -29,9 +31,12 @@ public class MainClass_GBCS_Bagging {
 
         // List of candidate Proposed GBCS feature-selected dataset paths
         String[][] datasetConfigs = {
-            {"Swedish", "Entire Data Folder/Swedish After GBCS-FS/Swedish After GBCS-FS.csv", "Swedish After GBCS-FS.csv"},
-            {"Flavia", "Entire Data Folder/Flavia After GBCS-FS/Flavia After GBCS-FS.csv", "Flavia After GBCS-FS.csv"},
-            {"Philippine", "Entire Data Folder/Philippine After GBCS-FS/Philippine After GBCS-FS.csv", "Philippine After GBCS-FS.csv"}
+                { "Swedish", "Entire Data Folder/Swedish After GBCS-FS/Swedish After GBCS-FS.csv",
+                        "Swedish After GBCS-FS.csv" },
+                { "Flavia", "Entire Data Folder/Flavia After GBCS-FS/Flavia After GBCS-FS.csv",
+                        "Flavia After GBCS-FS.csv" },
+                { "Philippine", "Entire Data Folder/Philippine After GBCS-FS/Philippine After GBCS-FS.csv",
+                        "Philippine After GBCS-FS.csv" }
         };
 
         for (String[] config : datasetConfigs) {
@@ -65,22 +70,21 @@ public class MainClass_GBCS_Bagging {
                     50,
                     Trainer.DEFAULT_SEED,
                     10,
-                    0.2D
-            );
+                    0.2D);
 
             // Configure Bagging Ensemble Trainer (10 weak learners)
             var baggingTrainer = new BaggingTrainer<>(
                     fmTrainer,
                     new VotingCombiner(),
                     10,
-                    Trainer.DEFAULT_SEED
-            );
+                    Trainer.DEFAULT_SEED);
 
             var sTrain = System.currentTimeMillis();
             var trainedModel = baggingTrainer.train(dataset);
             var eTrain = System.currentTimeMillis();
 
-            // Save trained model for web API deployment (e.g., "Swedish_Plant_Model_gbcs.ser")
+            // Save trained model for web API deployment (e.g.,
+            // "Swedish_Plant_Model_gbcs.ser")
             String outputModelName = datasetName + "_Plant_Model_gbcs.ser";
             System.out.println("Saving model to: " + outputModelName);
             try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outputModelName))) {

@@ -18,7 +18,8 @@ import java.io.PrintWriter;
 import java.nio.file.Paths;
 
 /**
- * Executes K-Fold Cross-Validation for the Proposed Genetic Binary Cuckoo Search (GBCS)
+ * Executes K-Fold Cross-Validation for the Proposed Genetic Binary Cuckoo
+ * Search (GBCS)
  * feature-selected datasets and logs performance metrics for paper tables.
  */
 public class MainClass_GBCS_CrossValidation {
@@ -36,16 +37,14 @@ public class MainClass_GBCS_CrossValidation {
                 50,
                 Trainer.DEFAULT_SEED,
                 10,
-                0.2D
-        );
+                0.2D);
 
         // Configure Bagging Ensemble Trainer (10 weak learners)
         var baggingTrainer = new BaggingTrainer<>(
                 fmTrainer,
                 new org.tribuo.classification.ensemble.VotingCombiner(),
                 10,
-                Trainer.DEFAULT_SEED
-        );
+                Trainer.DEFAULT_SEED);
 
         // Manual K-Fold setting (e.g. K = 3, 5, 7, or 9)
         int k = 7;
@@ -85,7 +84,7 @@ public class MainClass_GBCS_CrossValidation {
 
         // Append to CV_Manual_Results.txt for documentation
         try (FileWriter fw = new FileWriter("CV_Manual_Results.txt", true);
-             PrintWriter pw = new PrintWriter(fw)) {
+                PrintWriter pw = new PrintWriter(fw)) {
 
             pw.println("[Proposed GBCS Algorithm]");
             pw.println("=========================================");

@@ -60,37 +60,60 @@ public class MainClass_All_KFold_CrossValidation {
         List<DatasetTask> tasks = new ArrayList<>();
 
         // Proposed GBCS Feature-Selected Datasets (Subfolders & Root)
-        addIfFileExists(tasks, "Swedish", "Proposed_GBCS", Paths.get("Entire Data Folder", "Swedish After GBCS-FS", "Swedish After GBCS-FS.csv").toString());
-        addIfFileExists(tasks, "Flavia", "Proposed_GBCS", Paths.get("Entire Data Folder", "Flavia After GBCS-FS", "Flavia After GBCS-FS.csv").toString());
-        addIfFileExists(tasks, "Philippine", "Proposed_GBCS", Paths.get("Entire Data Folder", "Philippine After GBCS-FS", "Philippine After GBCS-FS.csv").toString());
-        addIfFileExists(tasks, "Swedish", "Proposed_GBCS", Paths.get("backend", "Entire Data Folder", "Swedish After GBCS-FS", "Swedish After GBCS-FS.csv").toString());
-        addIfFileExists(tasks, "Flavia", "Proposed_GBCS", Paths.get("backend", "Entire Data Folder", "Flavia After GBCS-FS", "Flavia After GBCS-FS.csv").toString());
-        addIfFileExists(tasks, "Philippine", "Proposed_GBCS", Paths.get("backend", "Entire Data Folder", "Philippine After GBCS-FS", "Philippine After GBCS-FS.csv").toString());
+        addIfFileExists(tasks, "Swedish", "Proposed_GBCS",
+                Paths.get("Entire Data Folder", "Swedish After GBCS-FS", "Swedish After GBCS-FS.csv").toString());
+        addIfFileExists(tasks, "Flavia", "Proposed_GBCS",
+                Paths.get("Entire Data Folder", "Flavia After GBCS-FS", "Flavia After GBCS-FS.csv").toString());
+        addIfFileExists(tasks, "Philippine", "Proposed_GBCS",
+                Paths.get("Entire Data Folder", "Philippine After GBCS-FS", "Philippine After GBCS-FS.csv").toString());
+        addIfFileExists(tasks, "Swedish", "Proposed_GBCS", Paths
+                .get("backend", "Entire Data Folder", "Swedish After GBCS-FS", "Swedish After GBCS-FS.csv").toString());
+        addIfFileExists(tasks, "Flavia", "Proposed_GBCS", Paths
+                .get("backend", "Entire Data Folder", "Flavia After GBCS-FS", "Flavia After GBCS-FS.csv").toString());
+        addIfFileExists(tasks, "Philippine", "Proposed_GBCS",
+                Paths.get("backend", "Entire Data Folder", "Philippine After GBCS-FS", "Philippine After GBCS-FS.csv")
+                        .toString());
         addIfFileExists(tasks, "Swedish", "Proposed_GBCS", "Swedish After GBCS-FS.csv");
         addIfFileExists(tasks, "Flavia", "Proposed_GBCS", "Flavia After GBCS-FS.csv");
         addIfFileExists(tasks, "Philippine", "Proposed_GBCS", "Philippine After GBCS-FS.csv");
 
         // Baseline BCS Feature-Selected Datasets (Subfolders & Root)
-        addIfFileExists(tasks, "Swedish", "Baseline_BCS", Paths.get("Entire Data Folder", "Swedish After FS", "Swedish After FS.csv").toString());
-        addIfFileExists(tasks, "Flavia", "Baseline_BCS", Paths.get("Entire Data Folder", "Flavia After FS", "Flavia After FS.csv").toString());
-        addIfFileExists(tasks, "Philippine", "Baseline_BCS", Paths.get("Entire Data Folder", "Philippine After FS", "Philippine After FS.csv").toString());
-        addIfFileExists(tasks, "Swedish", "Baseline_BCS", Paths.get("backend", "Entire Data Folder", "Swedish After FS", "Swedish After FS.csv").toString());
-        addIfFileExists(tasks, "Flavia", "Baseline_BCS", Paths.get("backend", "Entire Data Folder", "Flavia After FS", "Flavia After FS.csv").toString());
-        addIfFileExists(tasks, "Philippine", "Baseline_BCS", Paths.get("backend", "Entire Data Folder", "Philippine After FS", "Philippine After FS.csv").toString());
+        addIfFileExists(tasks, "Swedish", "Baseline_BCS",
+                Paths.get("Entire Data Folder", "Swedish After FS", "Swedish After FS.csv").toString());
+        addIfFileExists(tasks, "Flavia", "Baseline_BCS",
+                Paths.get("Entire Data Folder", "Flavia After FS", "Flavia After FS.csv").toString());
+        addIfFileExists(tasks, "Philippine", "Baseline_BCS",
+                Paths.get("Entire Data Folder", "Philippine After FS", "Philippine After FS.csv").toString());
+        addIfFileExists(tasks, "Swedish", "Baseline_BCS",
+                Paths.get("backend", "Entire Data Folder", "Swedish After FS", "Swedish After FS.csv").toString());
+        addIfFileExists(tasks, "Flavia", "Baseline_BCS",
+                Paths.get("backend", "Entire Data Folder", "Flavia After FS", "Flavia After FS.csv").toString());
+        addIfFileExists(tasks, "Philippine", "Baseline_BCS", Paths
+                .get("backend", "Entire Data Folder", "Philippine After FS", "Philippine After FS.csv").toString());
         addIfFileExists(tasks, "Swedish", "Baseline_BCS", "Swedish After FS.csv");
         addIfFileExists(tasks, "Flavia", "Baseline_BCS", "Flavia After FS.csv");
         addIfFileExists(tasks, "Philippine", "Baseline_BCS", "Philippine After FS.csv");
 
         // Legacy Subfolder Fallbacks
-        addIfFileExists(tasks, "Swedish", "Baseline_BCS", Paths.get("Entire Data Folder", "Swedish After IBCS-FS", "Swedish train data After FS.csv").toString());
-        addIfFileExists(tasks, "Swedish", "Baseline_BCS", Paths.get("Entire Data Folder", "Swedish After IBCS-FS", "Swedish After FS(2).csv").toString());
-        addIfFileExists(tasks, "Swedish", "Baseline_BCS", Paths.get("Entire Data Folder", "Swedish After IBCS-FS", "Swedish After FS.csv").toString());
-        addIfFileExists(tasks, "Flavia", "Baseline_BCS", Paths.get("Entire Data Folder", "Flavia After IBCS-FS", "Flavia train data After FS.csv").toString());
-        addIfFileExists(tasks, "Flavia", "Baseline_BCS", Paths.get("Entire Data Folder", "Flavia After IBCS-FS", "Flavia After FS(2).csv").toString());
-        addIfFileExists(tasks, "Flavia", "Baseline_BCS", Paths.get("Entire Data Folder", "Flavia After IBCS-FS", "Flavia After FS.csv").toString());
-        addIfFileExists(tasks, "Philippine", "Baseline_BCS", Paths.get("Entire Data Folder", "Philippine After IBCS-FS", "Philippine After FS(2).csv").toString());
-        addIfFileExists(tasks, "Philippine", "Baseline_BCS", Paths.get("Entire Data Folder", "Philippine After IBCS-FS", "Philippine train data After FS.csv").toString());
-        addIfFileExists(tasks, "Philippine", "Baseline_BCS", Paths.get("Entire Data Folder", "Philippine After IBCS-FS", "Philippine After FS.csv").toString());
+        addIfFileExists(tasks, "Swedish", "Baseline_BCS",
+                Paths.get("Entire Data Folder", "Swedish After IBCS-FS", "Swedish train data After FS.csv").toString());
+        addIfFileExists(tasks, "Swedish", "Baseline_BCS",
+                Paths.get("Entire Data Folder", "Swedish After IBCS-FS", "Swedish After FS(2).csv").toString());
+        addIfFileExists(tasks, "Swedish", "Baseline_BCS",
+                Paths.get("Entire Data Folder", "Swedish After IBCS-FS", "Swedish After FS.csv").toString());
+        addIfFileExists(tasks, "Flavia", "Baseline_BCS",
+                Paths.get("Entire Data Folder", "Flavia After IBCS-FS", "Flavia train data After FS.csv").toString());
+        addIfFileExists(tasks, "Flavia", "Baseline_BCS",
+                Paths.get("Entire Data Folder", "Flavia After IBCS-FS", "Flavia After FS(2).csv").toString());
+        addIfFileExists(tasks, "Flavia", "Baseline_BCS",
+                Paths.get("Entire Data Folder", "Flavia After IBCS-FS", "Flavia After FS.csv").toString());
+        addIfFileExists(tasks, "Philippine", "Baseline_BCS",
+                Paths.get("Entire Data Folder", "Philippine After IBCS-FS", "Philippine After FS(2).csv").toString());
+        addIfFileExists(tasks, "Philippine", "Baseline_BCS",
+                Paths.get("Entire Data Folder", "Philippine After IBCS-FS", "Philippine train data After FS.csv")
+                        .toString());
+        addIfFileExists(tasks, "Philippine", "Baseline_BCS",
+                Paths.get("Entire Data Folder", "Philippine After IBCS-FS", "Philippine After FS.csv").toString());
 
         if (tasks.isEmpty()) {
             System.err.println("ERROR: No valid dataset files found to process.");
@@ -169,7 +192,8 @@ public class MainClass_All_KFold_CrossValidation {
         }
 
         // 5. Print Final Batch K-Fold Cross-Validation Summary Table
-        System.out.println("\n=========================================================================================");
+        System.out
+                .println("\n=========================================================================================");
         System.out.println("   FINAL BATCH K-FOLD CROSS-VALIDATION SUMMARY TABLE");
         System.out.println("=========================================================================================");
         System.out.printf("%-12s | %-15s | %-7s | %-10s | %-10s | %-10s | %-10s | %-15s\n",
@@ -177,7 +201,8 @@ public class MainClass_All_KFold_CrossValidation {
         System.out.println("-----------------------------------------------------------------------------------------");
         for (KFoldResult r : allResults) {
             System.out.printf("%-12s | %-15s | K=%-5d | %-10.2f | %-10.2f | %-10.2f | %-10.2f | %-15s\n",
-                    r.datasetName(), r.algorithmName(), r.kFolds(), r.accuracy(), r.recall(), r.precision(), r.f1Score(), r.duration());
+                    r.datasetName(), r.algorithmName(), r.kFolds(), r.accuracy(), r.recall(), r.precision(),
+                    r.f1Score(), r.duration());
         }
         System.out.println("=========================================================================================");
 
@@ -204,7 +229,8 @@ public class MainClass_All_KFold_CrossValidation {
         if (file.exists() && !file.isDirectory()) {
             // Avoid adding duplicates for the same dataset and algorithm
             for (DatasetTask task : tasks) {
-                if (task.datasetName().equalsIgnoreCase(datasetName) && task.algorithmName().equalsIgnoreCase(algorithmName)) {
+                if (task.datasetName().equalsIgnoreCase(datasetName)
+                        && task.algorithmName().equalsIgnoreCase(algorithmName)) {
                     return;
                 }
             }

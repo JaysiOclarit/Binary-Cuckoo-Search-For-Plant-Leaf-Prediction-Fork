@@ -84,7 +84,7 @@ public class MainClass_CrossValidation {
         // 2. Output to Text File
         // Setting FileWriter to 'true' ensures it appends rather than overwriting
         try (FileWriter fw = new FileWriter("CV_Manual_Results.txt", true);
-             PrintWriter pw = new PrintWriter(fw)) {
+                PrintWriter pw = new PrintWriter(fw)) {
 
             pw.println("=========================================");
             pw.println("Results for K = " + k);

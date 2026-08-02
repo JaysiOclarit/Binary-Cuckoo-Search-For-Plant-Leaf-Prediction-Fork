@@ -23,13 +23,16 @@ import java.util.Map;
 /**
  * Automated Exploratory Data Analysis (EDA) Runner.
  * <p>
- * Implements Section 2.2 (Phase 2: Data Understanding & EDA) of the Proposed Paper:
- * 1. Class Distribution & Imbalance Ratio Analysis (Swedish, Flavia, Philippine)
+ * Implements Section 2.2 (Phase 2: Data Understanding & EDA) of the Proposed
+ * Paper:
+ * 1. Class Distribution & Imbalance Ratio Analysis (Swedish, Flavia,
+ * Philippine)
  * 2. Feature Embedding Statistical Summary (Mean, Std Dev, Variance)
  * 3. High Correlation Pair Identification (Feature Redundancy Analysis)
  * 4. Generates 'EDA_Analysis_Report.txt' and 'Class_Distribution_Analysis.csv'
  * </p>
- * Reference: Section 2.2 of Proposed Paper (Fernandez, Oclarit, Yos, & Vilchez, 2025).
+ * Reference: Section 2.2 of Proposed Paper (Fernandez, Oclarit, Yos, & Vilchez,
+ * 2025).
  */
 public class MainClass_EDA_Analysis {
 
@@ -79,10 +82,12 @@ public class MainClass_EDA_Analysis {
 
         report.append("=================================================================================\n");
         report.append("SUMMARY OF EDA FINDINGS FOR THESIS METHODOLOGY:\n");
-        report.append("  1. Class Imbalance: Philippine Medicinal dataset exhibits natural imbalance (ratio ~1:1.71),\n");
+        report.append(
+                "  1. Class Imbalance: Philippine Medicinal dataset exhibits natural imbalance (ratio ~1:1.71),\n");
         report.append("     justifying the use of Macro F1-Score, Precision, and Recall.\n");
         report.append("  2. Redundancy & Curse of Dimensionality: High correlation pairs (rho > 0.85) confirm\n");
-        report.append("     substantial feature overlap, validating the Proposed Correlation-Aware Fitness Function.\n");
+        report.append(
+                "     substantial feature overlap, validating the Proposed Correlation-Aware Fitness Function.\n");
         report.append("=================================================================================\n");
 
         // 1. Print report to console
@@ -100,10 +105,12 @@ public class MainClass_EDA_Analysis {
             }
         }
 
-        System.out.println("SUCCESS: EDA Report saved to 'EDA_Analysis_Report.txt' and 'Class_Distribution_Analysis.csv'");
+        System.out.println(
+                "SUCCESS: EDA Report saved to 'EDA_Analysis_Report.txt' and 'Class_Distribution_Analysis.csv'");
     }
 
-    private static void analyzeClassDistribution(String datasetPrefix, Dataset<Label> dataset, StringBuilder report, List<String> csvRows) {
+    private static void analyzeClassDistribution(String datasetPrefix, Dataset<Label> dataset, StringBuilder report,
+            List<String> csvRows) {
         Map<String, Integer> classCounts = new HashMap<>();
         for (Example<Label> example : dataset) {
             String labelName = example.getOutput().getLabel();
@@ -122,7 +129,8 @@ public class MainClass_EDA_Analysis {
 
         report.append(String.format("  - Total Samples: %d\n", totalSamples));
         report.append(String.format("  - Total Species Classes: %d\n", numClasses));
-        report.append(String.format("  - Min Class Count: %d | Max Class Count: %d | Mean Class Count: %.2f\n", minCount, maxCount, avgCount));
+        report.append(String.format("  - Min Class Count: %d | Max Class Count: %d | Mean Class Count: %.2f\n",
+                minCount, maxCount, avgCount));
         report.append(String.format("  - Class Imbalance Ratio (Max/Min): %.2f:1 (%s)\n", imbalanceRatio,
                 imbalanceRatio == 1.0 ? "Perfectly Balanced" : "Imbalanced"));
 
@@ -155,7 +163,8 @@ public class MainClass_EDA_Analysis {
         double[] stds = new double[numFeatures];
         for (int f = 0; f < numFeatures; f++) {
             double sum = 0.0;
-            for (int i = 0; i < numInstances; i++) sum += featureData[f][i];
+            for (int i = 0; i < numInstances; i++)
+                sum += featureData[f][i];
             means[f] = sum / numInstances;
 
             double sqSum = 0.0;
@@ -173,13 +182,15 @@ public class MainClass_EDA_Analysis {
 
         for (int i = 0; i < numFeatures; i++) {
             for (int j = i + 1; j < numFeatures; j++) {
-                if (stds[i] == 0 || stds[j] == 0) continue;
+                if (stds[i] == 0 || stds[j] == 0)
+                    continue;
                 double cov = 0.0;
                 for (int k = 0; k < numInstances; k++) {
                     cov += (featureData[i][k] - means[i]) * (featureData[j][k] - means[j]);
                 }
                 double r = cov / (stds[i] * stds[j] * numInstances);
-                if (Double.isNaN(r)) r = 0.0D;
+                if (Double.isNaN(r))
+                    r = 0.0D;
                 double absR = Math.abs(r);
                 sumAbsCorr += absR;
                 pairCount++;

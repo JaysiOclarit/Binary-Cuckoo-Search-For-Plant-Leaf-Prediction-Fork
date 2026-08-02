@@ -46,7 +46,9 @@ public class MainClass_GBCS_For_FS_and_Bagging {
                 System.out.println("   BATCH PROPOSED GENETIC BINARY CUCKOO SEARCH (GBCS) FEATURE SELECTION   ");
                 System.out.println("=================================================================\n");
 
-                record GBCSFSSummary(String dataset, int originalFeatures, int selectedFeatures, double reductionRatio, String duration) {}
+                record GBCSFSSummary(String dataset, int originalFeatures, int selectedFeatures, double reductionRatio,
+                                String duration) {
+                }
                 List<GBCSFSSummary> summaryList = new ArrayList<>();
 
                 for (java.io.File csvFile : rawCsvFiles) {
@@ -112,7 +114,8 @@ public class MainClass_GBCS_For_FS_and_Bagging {
                         int optIter = optimizer.getOptimalConvergenceIteration();
                         String durationStr = Util.formatDuration(sDate, eDate);
 
-                        summaryList.add(new GBCSFSSummary(datasetPrefix, origFeatureCount, selFeatureCount, reductionRatio, durationStr));
+                        summaryList.add(new GBCSFSSummary(datasetPrefix, origFeatureCount, selFeatureCount,
+                                        reductionRatio, durationStr));
 
                         System.out.println("\nRESULTS for " + datasetPrefix + " (GBCS):");
                         System.out.printf("  FS Duration: %s\n", durationStr);
@@ -124,16 +127,22 @@ public class MainClass_GBCS_For_FS_and_Bagging {
                         System.out.println("  Saved Convergence To: " + csvConvergencePath);
                 }
 
-                System.out.println("\n=========================================================================================");
+                System.out.println(
+                                "\n=========================================================================================");
                 System.out.println("   FINAL BATCH PROPOSED GBCS FEATURE SELECTION SUMMARY TABLE");
-                System.out.println("=========================================================================================");
-                System.out.printf("%-15s | %-12s | %-12s | %-12s | %-15s\n", "Dataset", "Orig Features", "Sel Features", "FRR (%)", "Duration");
-                System.out.println("-----------------------------------------------------------------------------------------");
+                System.out.println(
+                                "=========================================================================================");
+                System.out.printf("%-15s | %-12s | %-12s | %-12s | %-15s\n", "Dataset", "Orig Features", "Sel Features",
+                                "FRR (%)", "Duration");
+                System.out.println(
+                                "-----------------------------------------------------------------------------------------");
                 for (GBCSFSSummary s : summaryList) {
                         System.out.printf("%-15s | %-12d | %-12d | %-11.2f%% | %-15s\n",
-                                        s.dataset(), s.originalFeatures(), s.selectedFeatures(), s.reductionRatio(), s.duration());
+                                        s.dataset(), s.originalFeatures(), s.selectedFeatures(), s.reductionRatio(),
+                                        s.duration());
                 }
-                System.out.println("=========================================================================================");
+                System.out.println(
+                                "=========================================================================================");
                 System.out.println("SUCCESS: All raw datasets processed with Proposed GBCS!");
                 System.out.println("=================================================================");
         }

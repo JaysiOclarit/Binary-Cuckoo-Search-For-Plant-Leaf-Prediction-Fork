@@ -21,11 +21,13 @@ public class MainClass_Bagging {
         System.out.println("   BATCH BAGGING ENSEMBLE MODEL TRAINER (BASELINE BCS)           ");
         System.out.println("=================================================================\n");
 
-        // List of candidate Baseline BCS feature-selected dataset paths (Excludes partial train/test splits)
+        // List of candidate Baseline BCS feature-selected dataset paths (Excludes
+        // partial train/test splits)
         String[][] datasetConfigs = {
-            {"Swedish", "Entire Data Folder/Swedish After FS/Swedish After FS.csv", "Swedish After FS.csv"},
-            {"Flavia", "Entire Data Folder/Flavia After FS/Flavia After FS.csv", "Flavia After FS.csv"},
-            {"Philippine", "Entire Data Folder/Philippine After FS/Philippine After FS.csv", "Philippine After FS.csv"}
+                { "Swedish", "Entire Data Folder/Swedish After FS/Swedish After FS.csv", "Swedish After FS.csv" },
+                { "Flavia", "Entire Data Folder/Flavia After FS/Flavia After FS.csv", "Flavia After FS.csv" },
+                { "Philippine", "Entire Data Folder/Philippine After FS/Philippine After FS.csv",
+                        "Philippine After FS.csv" }
         };
 
         for (String[] config : datasetConfigs) {
@@ -59,16 +61,14 @@ public class MainClass_Bagging {
                     50,
                     Trainer.DEFAULT_SEED,
                     10,
-                    0.2D
-            );
+                    0.2D);
 
             // Configure Bagging Trainer (10 weak learners)
             var baggingTrainer = new BaggingTrainer<>(
                     fmTrainer,
                     new VotingCombiner(),
                     10,
-                    Trainer.DEFAULT_SEED
-            );
+                    Trainer.DEFAULT_SEED);
 
             var sTrain = System.currentTimeMillis();
             var trainedModel = baggingTrainer.train(dataset);
@@ -77,7 +77,8 @@ public class MainClass_Bagging {
             // Save trained model (e.g., "Swedish_Plant_Model_bcs.ser")
             String outputModelName = datasetName + "_Plant_Model_bcs.ser";
             System.out.println("Saving model to: " + outputModelName);
-            try (java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(new java.io.FileOutputStream(outputModelName))) {
+            try (java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(
+                    new java.io.FileOutputStream(outputModelName))) {
                 oos.writeObject(trainedModel);
                 System.out.println("SUCCESS: Model saved as '" + outputModelName + "' in project root.");
             } catch (java.io.IOException e) {

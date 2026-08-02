@@ -107,7 +107,8 @@ public final class GeneticCuckooSearchOptimizer implements FeatureSelector<Label
     private double[][] continuousPositions;
 
     /**
-     * Generates initial random continuous positions in [-2.0, 2.0] and initial binary population.
+     * Generates initial random continuous positions in [-2.0, 2.0] and initial
+     * binary population.
      */
     private int[][] generatePopulation(int totalNumberOfFeatures) {
         setOfSolutions = new int[this.populationSize][totalNumberOfFeatures];
@@ -146,7 +147,9 @@ public final class GeneticCuckooSearchOptimizer implements FeatureSelector<Label
         int[] initBestSubSet = solutionScores.get(0).subSet;
         double initBestScore = solutionScores.get(0).score;
         int initSelectedCount = 0;
-        for (int bit : initBestSubSet) if (bit == 1) initSelectedCount++;
+        for (int bit : initBestSubSet)
+            if (bit == 1)
+                initSelectedCount++;
         double initRedRatio = (1.0 - ((double) initSelectedCount / numFeatures)) * 100.0;
         convergenceHistory.add(new ConvergenceStep(0, initBestScore, initSelectedCount, initRedRatio,
                 "Initial Population Initialization (Random Nest Generation)"));
@@ -278,7 +281,8 @@ public final class GeneticCuckooSearchOptimizer implements FeatureSelector<Label
         return new FeatureSelectorProvenanceImpl(this);
     }
 
-    private void keepBestAfterEvaluation(Dataset<Label> dataset, ImmutableFeatureMap FMap, double[] alteredPos, int[] alteredSolution, int targetIdx) {
+    private void keepBestAfterEvaluation(Dataset<Label> dataset, ImmutableFeatureMap FMap, double[] alteredPos,
+            int[] alteredSolution, int targetIdx) {
         double scoreOfModifiedSolution = fitnessFunction.EvaluateSolution(this, dataset, FMap, alteredSolution);
         double scoreOfSolution = fitnessFunction.EvaluateSolution(this, dataset, FMap, setOfSolutions[targetIdx]);
         if (scoreOfModifiedSolution > scoreOfSolution) {
@@ -290,7 +294,8 @@ public final class GeneticCuckooSearchOptimizer implements FeatureSelector<Label
     /**
      * Record holding per-iteration convergence statistics.
      */
-    public record ConvergenceStep(int iteration, double bestFitness, int selectedFeatures, double reductionRatioPercent, String description) {
+    public record ConvergenceStep(int iteration, double bestFitness, int selectedFeatures, double reductionRatioPercent,
+            String description) {
     }
 
     record GBCSFeatureSet(int[] subSet, double score) {
