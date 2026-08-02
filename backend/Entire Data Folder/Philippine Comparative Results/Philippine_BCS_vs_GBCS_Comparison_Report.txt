@@ -1,0 +1,25 @@
+=================================================================================
+     COMPARATIVE ANALYSIS REPORT: BASELINE BCS vs PROPOSED GBCS (PHILIPPINE)
+=================================================================================
+
+Metric / Evaluation Parameter    | Baseline BCS         | Proposed GBCS (Ours)
+---------------------------------------------------------------------------------
+FS Execution Time                | (01:00:40:818)       | (01:03:22:326)      
+Original Dataset Features        | 2048                 | 2048                
+Selected Feature Subset Size     | 1042                 | 1353                
+Feature Reduction Ratio (FRR)    | 49.12               % | 33.94               %
+Avg Feature Correlation (rho_avg) | 0.1249               | 0.1247              
+Optimal Convergence Iteration    | Iteration 1          | Iteration 20        
+---------------------------------------------------------------------------------
+Test Classification Accuracy     | 97.13               % | 97.08               %
+Macro-Averaged Precision         | 97.18               % | 97.12               %
+Macro-Averaged Recall            | 97.15               % | 97.08               %
+Macro-Averaged F1-Score          | 97.14               % | 97.07               %
+=================================================================================
+
+KEY HIGHLIGHTS & IMPROVEMENTS (GBCS vs BCS):
+  - Accuracy Improvement: -0.05%
+  - Feature Reduction Improvement: -15.19%
+  - Feature Redundancy Reduction: +0.0002 lower average correlation
+  - Convergence Speedup: -19 iterations faster stabilization
+=================================================================================

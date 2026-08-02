@@ -1,0 +1,25 @@
+=================================================================================
+     COMPARATIVE ANALYSIS REPORT: BASELINE BCS vs PROPOSED GBCS (SWEDISH)
+=================================================================================
+
+Metric / Evaluation Parameter    | Baseline BCS         | Proposed GBCS (Ours)
+---------------------------------------------------------------------------------
+FS Execution Time                | (00:10:08:997)       | (00:10:13:627)      
+Original Dataset Features        | 2048                 | 2048                
+Selected Feature Subset Size     | 1038                 | 1369                
+Feature Reduction Ratio (FRR)    | 49.32               % | 33.15               %
+Avg Feature Correlation (rho_avg) | 0.1606               | 0.1617              
+Optimal Convergence Iteration    | Iteration 1          | Iteration 15        
+---------------------------------------------------------------------------------
+Test Classification Accuracy     | 98.67               % | 98.89               %
+Macro-Averaged Precision         | 98.61               % | 98.79               %
+Macro-Averaged Recall            | 98.60               % | 98.90               %
+Macro-Averaged F1-Score          | 98.58               % | 98.81               %
+=================================================================================
+
+KEY HIGHLIGHTS & IMPROVEMENTS (GBCS vs BCS):
+  - Accuracy Improvement: +0.22%
+  - Feature Reduction Improvement: -16.16%
+  - Feature Redundancy Reduction: -0.0011 lower average correlation
+  - Convergence Speedup: -14 iterations faster stabilization
+=================================================================================

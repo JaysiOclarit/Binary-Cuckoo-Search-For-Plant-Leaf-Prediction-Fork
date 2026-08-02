@@ -1,0 +1,25 @@
+=================================================================================
+     COMPARATIVE ANALYSIS REPORT: BASELINE BCS vs PROPOSED GBCS (FLAVIA)
+=================================================================================
+
+Metric / Evaluation Parameter    | Baseline BCS         | Proposed GBCS (Ours)
+---------------------------------------------------------------------------------
+FS Execution Time                | (00:17:04:341)       | (00:18:23:234)      
+Original Dataset Features        | 2048                 | 2048                
+Selected Feature Subset Size     | 1018                 | 1349                
+Feature Reduction Ratio (FRR)    | 50.29               % | 34.13               %
+Avg Feature Correlation (rho_avg) | 0.1504               | 0.1499              
+Optimal Convergence Iteration    | Iteration 0          | Iteration 20        
+---------------------------------------------------------------------------------
+Test Classification Accuracy     | 96.33               % | 96.59               %
+Macro-Averaged Precision         | 93.60               % | 93.63               %
+Macro-Averaged Recall            | 93.13               % | 93.41               %
+Macro-Averaged F1-Score          | 93.27               % | 93.45               %
+=================================================================================
+
+KEY HIGHLIGHTS & IMPROVEMENTS (GBCS vs BCS):
+  - Accuracy Improvement: +0.26%
+  - Feature Reduction Improvement: -16.16%
+  - Feature Redundancy Reduction: +0.0005 lower average correlation
+  - Convergence Speedup: -20 iterations faster stabilization
+=================================================================================

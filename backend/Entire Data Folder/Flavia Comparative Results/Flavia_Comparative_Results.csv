@@ -1,0 +1,9 @@
+Metric,Baseline_BCS,Proposed_GBCS,Difference
+ClassificationAccuracy,96.3303,96.5924,+0.2621
+Precision,93.6028,93.6281,+0.0253
+Recall,93.1254,93.4105,+0.2851
+F1Score,93.2708,93.4531,+0.1823
+SelectedFeatures,1018,1349,331
+ReductionRatioPercent,50.29,34.13,-16.16
+AverageCorrelation,0.1504,0.1499,-0.0005
+OptimalConvergenceIteration,0,20,20
