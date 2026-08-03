@@ -1,22 +1,22 @@
 Iteration,BestFitnessScore,SelectedFeatures,ReductionRatioPercent,Description
-0,0.870288,1551,24.27%,"Initial Population Initialization (Random Nest Generation)"
-1,0.878577,1394,31.93%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-2,0.878577,1394,31.93%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-3,0.878577,1394,31.93%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-4,0.880282,1432,30.08%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-5,0.880282,1432,30.08%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-6,0.880282,1432,30.08%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-7,0.880687,1383,32.47%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-8,0.881862,1392,32.03%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-9,0.883145,1377,32.76%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-10,0.883347,1353,33.94%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-11,0.883347,1353,33.94%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-12,0.883347,1353,33.94%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-13,0.883644,1390,32.13%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-14,0.884028,1366,33.30%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-15,0.884028,1366,33.30%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-16,0.885465,1357,33.74%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-17,0.885743,1353,33.94%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-18,0.885833,1368,33.20%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-19,0.885833,1368,33.20%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
-20,0.886053,1353,33.94%,"Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)"
+0,0.870288,1551,24.27%,Initial Population Initialization (Random Nest Generation)
+1,0.878577,1394,31.93%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+2,0.878577,1394,31.93%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+3,0.878577,1394,31.93%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+4,0.880282,1432,30.08%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+5,0.880282,1432,30.08%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+6,0.880282,1432,30.08%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+7,0.880687,1383,32.47%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+8,0.881862,1392,32.03%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+9,0.883145,1377,32.76%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+10,0.883347,1353,33.94%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+11,0.883347,1353,33.94%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+12,0.883347,1353,33.94%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+13,0.883644,1390,32.13%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+14,0.884028,1366,33.30%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+15,0.884028,1366,33.30%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+16,0.885465,1357,33.74%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+17,0.885743,1353,33.94%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+18,0.885833,1368,33.20%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+19,0.885833,1368,33.20%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)
+20,0.886053,1353,33.94%,Hybrid Evolution (Lévy Flight + Uniform Crossover Pc=0.8 + Mutation Pm=0.02)

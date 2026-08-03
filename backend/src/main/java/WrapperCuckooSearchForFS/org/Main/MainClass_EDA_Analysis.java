@@ -52,6 +52,9 @@ public class MainClass_EDA_Analysis {
 
         // Scan raw datasets in Entire Data Folder/Original Dataset/
         File originalDir = Paths.get("Entire Data Folder", "Original Dataset").toFile();
+        if (!originalDir.exists() || !originalDir.isDirectory()) {
+            originalDir = Paths.get("backend", "Entire Data Folder", "Original Dataset").toFile();
+        }
         File[] csvFiles = originalDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".csv"));
 
         if (csvFiles == null || csvFiles.length == 0) {
