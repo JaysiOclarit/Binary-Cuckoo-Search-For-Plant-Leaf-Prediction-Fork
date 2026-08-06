@@ -24,59 +24,29 @@ export const App: React.FC = () => {
       .catch(() => setApiStatus(false));
   }, []);
 
-  // API Call Handlers with Smart Fallbacks
+  // Pure, honest classification handler (No fake fallbacks or filename guessing)
   const handleClassifyImage = async (file: File, dataset: string, algorithm: string): Promise<PredictionResult> => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('dataset', dataset);
     formData.append('algorithm', algorithm);
 
+    let res: Response;
     try {
-      const res = await fetch(`/api/predict-image?dataset=${dataset}&algorithm=${algorithm}`, {
+      res = await fetch(`/api/predict-image?dataset=${dataset}&algorithm=${algorithm}`, {
         method: 'POST',
         body: formData,
       });
-      if (res.ok) {
-        return await res.json();
-      }
-    } catch (e) {
-      console.warn('Backend API offline or unreachable, utilizing filename-aware classification engine:', e);
+    } catch (e: any) {
+      throw new Error(`Failed to connect to Java backend on http://localhost:8080. Please ensure SpringBootApp is running.`);
     }
 
-    // Filename-aware & dataset-matched species classification fallback
-    const fname = file.name.toLowerCase();
-    let predictedClass = 'Phyllanthus niruri';
-
-    if (fname.includes('phyllanthus') || fname.includes('niruri') || fname.includes('sampasampalukan')) {
-      predictedClass = 'Phyllanthus niruri';
-    } else if (fname.includes('senna') || fname.includes('akapulko')) {
-      predictedClass = 'Senna alata';
-    } else if (fname.includes('leucaena') || fname.includes('ipil')) {
-      predictedClass = 'Leucaena leucocephala';
-    } else if (fname.includes('fagus')) {
-      predictedClass = 'Fagus sylvatica';
-    } else if (fname.includes('quercus')) {
-      predictedClass = 'Quercus robur';
-    } else if (fname.includes('acer')) {
-      predictedClass = 'Acer palmatum';
-    } else if (fname.includes('ginkgo')) {
-      predictedClass = 'Ginkgo biloba';
-    } else {
-      const speciesList = dataset === 'swedish'
-        ? ['Fagus sylvatica', 'Quercus robur', 'Acer palmatum']
-        : dataset === 'flavia'
-          ? ['Ginkgo biloba', 'Acer palmatum']
-          : ['Phyllanthus niruri', 'Senna alata', 'Leucaena leucocephala', 'Momordica charantia'];
-      predictedClass = speciesList[Math.floor(Math.random() * speciesList.length)];
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || `Backend returned HTTP error status ${res.status}`);
     }
 
-    return {
-      predictedClass,
-      confidenceScore: 0.9785,
-      dataset,
-      algorithm,
-      featureCount: algorithm === 'gbcs' ? 1369 : 985,
-    };
+    return await res.json();
   };
 
   const handleClassifyPreset = async (presetName: string, dataset: string, algorithm: string): Promise<PredictionResult> => {
@@ -195,6 +165,7 @@ export const App: React.FC = () => {
         {activeTab === 'classifier' && (
           <LeafClassifier
             selectedDataset={selectedDataset}
+            setSelectedDataset={setSelectedDataset}
             onClassifyImage={handleClassifyImage}
             onClassifyPreset={handleClassifyPreset}
           />

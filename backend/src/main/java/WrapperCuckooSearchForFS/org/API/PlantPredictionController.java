@@ -40,6 +40,8 @@ public class PlantPredictionController {
         loadModel("swedish", "Swedish_Plant_Model.ser");
         loadModel("flavia", "Flavia_Plant_Model.ser");
         loadModel("philippine", "Philippine_Plant_Model.ser");
+
+        System.out.println("🌱 Total active loaded model registry keys: " + modelRegistry.keySet());
     }
 
     private void loadModel(String key, String filepath) {
@@ -59,7 +61,8 @@ public class PlantPredictionController {
                 @SuppressWarnings("unchecked")
                 Model<Label> model = (Model<Label>) ois.readObject();
                 modelRegistry.put(key.toLowerCase(), model);
-                System.out.println("✅ Successfully loaded model for: " + key + " (" + model.getFeatureIDMap().size() + " features)");
+                System.out.println("✅ Successfully loaded model for: " + key + " (" + model.getFeatureIDMap().size()
+                        + " features)");
             } catch (Exception e) {
                 System.err.println("⚠️ Error reading model " + filepath + ": " + e.getMessage());
             }
@@ -69,38 +72,83 @@ public class PlantPredictionController {
     }
 
     // DTO Records
-    public record PredictionRequest(String dataset, String algorithm, Map<String, Double> features) {}
-    public record PredictionResponse(String predictedClass, double confidenceScore, String dataset, String algorithm, int featureCount) {}
-    
+    public record PredictionRequest(String dataset, String algorithm, Map<String, Double> features) {
+    }
+
+    public record PredictionResponse(String predictedClass, double confidenceScore, String dataset, String algorithm,
+            int featureCount) {
+    }
+
     public record ComparisonResponse(
             String dataset,
             String bcsPredictedClass, double bcsConfidence, int bcsFeatureCount, double bcsReductionRatio,
             String gbcsPredictedClass, double gbcsConfidence, int gbcsFeatureCount, double gbcsReductionRatio,
             String winner,
-            List<Map<String, Object>> radarProfile
-    ) {}
+            List<Map<String, Object>> radarProfile) {
+    }
 
-    public record PlantSpeciesInfo(String name, String scientificName, String dataset, String family, String region, String description, List<String> uses) {}
+    public record PlantSpeciesInfo(String name, String scientificName, String dataset, String family, String region,
+            String description, List<String> uses) {
+    }
 
     @PostMapping("/predict")
     public ResponseEntity<?> predict(@RequestBody PredictionRequest request) {
-        String targetDataset = request.dataset() != null ? request.dataset().toLowerCase() : "swedish";
-        String algorithm = request.algorithm() != null ? request.algorithm().toLowerCase() : "gbcs";
+        String targetDataset = request.dataset() != null ? request.dataset().toLowerCase().trim() : "swedish";
+        String rawAlgo = request.algorithm() != null ? request.algorithm().toLowerCase().trim() : "gbcs";
+
+        // Clean dataset name (e.g. "philippine native" -> "philippine")
+        if (targetDataset.contains("philippine"))
+            targetDataset = "philippine";
+        else if (targetDataset.contains("flavia"))
+            targetDataset = "flavia";
+        else if (targetDataset.contains("swedish"))
+            targetDataset = "swedish";
+
+        // Clean algorithm name
+        String algorithm = (rawAlgo.contains("bcs") && !rawAlgo.contains("gbcs")) ? "bcs" : "gbcs";
 
         String modelKey = targetDataset + "_" + algorithm;
         Model<Label> model = modelRegistry.get(modelKey);
-        if (model == null) model = modelRegistry.get(targetDataset);
+
+        if (model == null) {
+            model = modelRegistry.get(targetDataset + "_gbcs");
+        }
+        if (model == null) {
+            model = modelRegistry.get(targetDataset + "_bcs");
+        }
+        if (model == null) {
+            model = modelRegistry.get(targetDataset);
+        }
+
+        if (model == null) {
+            for (Map.Entry<String, Model<Label>> entry : modelRegistry.entrySet()) {
+                if (entry.getKey().toLowerCase().contains(targetDataset)) {
+                    model = entry.getValue();
+                    break;
+                }
+            }
+        }
 
         if (model == null) {
             return ResponseEntity.badRequest().body(Map.of(
-                    "error", "Model not found for key: " + modelKey,
-                    "availableKeys", modelRegistry.keySet()
-            ));
+                    "error",
+                    "Model not initialized for dataset: '" + targetDataset + "'. Loaded keys: "
+                            + modelRegistry.keySet(),
+                    "availableKeys", modelRegistry.keySet()));
         }
 
+        boolean isPhilippine = targetDataset.contains("philippine");
         Example<Label> example = new ArrayExample<>(new Label("UNKNOWN"));
         if (request.features() != null) {
-            request.features().forEach((fName, fVal) -> example.add(new Feature(fName, fVal)));
+            request.features().forEach((fName, fVal) -> {
+                String cleanKey = fName;
+                if (isPhilippine && fName.startsWith("Att")) {
+                    cleanKey = fName.replace("Att", "n");
+                } else if (!isPhilippine && fName.startsWith("n")) {
+                    cleanKey = fName.replace("n", "Att");
+                }
+                example.add(new Feature(cleanKey, fVal));
+            });
         }
 
         Prediction<Label> prediction = model.predict(example);
@@ -116,7 +164,7 @@ public class PlantPredictionController {
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "dataset", defaultValue = "swedish") String dataset,
             @RequestParam(value = "algorithm", defaultValue = "gbcs") String algorithm) {
-        
+
         try {
             // Save temporary image file
             Path tempImgPath = Files.createTempFile("leaf_", "_" + file.getOriginalFilename());
@@ -126,15 +174,17 @@ public class PlantPredictionController {
             Map<String, Double> extractedFeatures = runFeatureExtractionScript(tempImgPath.toString(), dataset);
             Files.deleteIfExists(tempImgPath);
 
-            if (extractedFeatures.isEmpty()) {
-                extractedFeatures = generateSampleFeatures(dataset);
+            if (extractedFeatures == null || extractedFeatures.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error",
+                        "Inception-V3 feature extraction failed for uploaded image file. Please check image format."));
             }
 
             PredictionRequest req = new PredictionRequest(dataset, algorithm, extractedFeatures);
             return predict(req);
 
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(Map.of("error", "Failed processing leaf image: " + e.getMessage()));
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Failed processing leaf image: " + e.getMessage()));
         }
     }
 
@@ -142,7 +192,7 @@ public class PlantPredictionController {
     public ResponseEntity<?> compareSpecimen(
             @RequestParam(value = "dataset", defaultValue = "swedish") String dataset,
             @RequestBody(required = false) Map<String, Double> inputFeatures) {
-        
+
         Map<String, Double> features = (inputFeatures != null && !inputFeatures.isEmpty())
                 ? inputFeatures
                 : generateSampleFeatures(dataset);
@@ -154,7 +204,8 @@ public class PlantPredictionController {
         Model<Label> gbcsModel = modelRegistry.get(gbcsKey);
 
         if (bcsModel == null || gbcsModel == null) {
-            return ResponseEntity.badRequest().body(Map.of("error", "BCS or GBCS model not initialized for dataset: " + dataset));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "BCS or GBCS model not initialized for dataset: " + dataset));
         }
 
         // BCS Prediction
@@ -171,19 +222,20 @@ public class PlantPredictionController {
         int bcsCount = bcsModel.getFeatureIDMap().size();
         int gbcsCount = gbcsModel.getFeatureIDMap().size();
 
-        double bcsRed = ((double)(origCount - bcsCount) / origCount) * 100.0;
-        double gbcsRed = ((double)(origCount - gbcsCount) / origCount) * 100.0;
+        double bcsRed = ((double) (origCount - bcsCount) / origCount) * 100.0;
+        double gbcsRed = ((double) (origCount - gbcsCount) / origCount) * 100.0;
 
         String winner = "GBCS (Higher Feature Reduction & Macro F1 Accuracy)";
 
-        // Compute REAL Subspace Activation Profile (6 feature buckets across 2048 dimensions)
+        // Compute REAL Subspace Activation Profile (6 feature buckets across 2048
+        // dimensions)
         String[] categoryNames = {
-            "Deep Conv Subspace A",
-            "Deep Conv Subspace B",
-            "Conv Bottleneck Embedding",
-            "Spatial Pooling Vector",
-            "Channel Activation Weights",
-            "Hierarchical Representation"
+                "Deep Conv Subspace A",
+                "Deep Conv Subspace B",
+                "Conv Bottleneck Embedding",
+                "Spatial Pooling Vector",
+                "Channel Activation Weights",
+                "Hierarchical Representation"
         };
         int bucketSize = 2048 / 6;
         int[] bcsBucketCounts = new int[6];
@@ -195,7 +247,8 @@ public class PlantPredictionController {
                 int idx = Integer.parseInt(name.replaceAll("\\D+", ""));
                 int bucket = Math.min(idx / bucketSize, 5);
                 bcsBucketCounts[bucket]++;
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         for (var featureInfo : gbcsModel.getFeatureIDMap()) {
@@ -204,7 +257,8 @@ public class PlantPredictionController {
                 int idx = Integer.parseInt(name.replaceAll("\\D+", ""));
                 int bucket = Math.min(idx / bucketSize, 5);
                 gbcsBucketCounts[bucket]++;
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         List<Map<String, Object>> radarProfile = new ArrayList<>();
@@ -212,10 +266,9 @@ public class PlantPredictionController {
             double bcsPct = Math.round(((double) bcsBucketCounts[i] / bucketSize) * 100.0 * 10.0) / 10.0;
             double gbcsPct = Math.round(((double) gbcsBucketCounts[i] / bucketSize) * 100.0 * 10.0) / 10.0;
             radarProfile.add(Map.of(
-                "category", categoryNames[i],
-                "BCS", bcsPct,
-                "GBCS", gbcsPct
-            ));
+                    "category", categoryNames[i],
+                    "BCS", bcsPct,
+                    "GBCS", gbcsPct));
         }
 
         ComparisonResponse resp = new ComparisonResponse(
@@ -223,8 +276,7 @@ public class PlantPredictionController {
                 predBCS.getOutput().getLabel(), predBCS.getOutput().getScore(), bcsCount, bcsRed,
                 predGBCS.getOutput().getLabel(), predGBCS.getOutput().getScore(), gbcsCount, gbcsRed,
                 winner,
-                radarProfile
-        );
+                radarProfile);
 
         return ResponseEntity.ok(resp);
     }
@@ -234,16 +286,22 @@ public class PlantPredictionController {
         List<Map<String, Object>> metrics = new ArrayList<>();
 
         // Swedish Dataset Metrics (K=9)
-        metrics.add(Map.of("dataset", "Swedish", "algorithm", "Proposed GBCS", "accuracy", 96.89, "precision", 96.92, "recall", 97.10, "f1", 96.63, "featuresSelected", 1349, "reductionRatio", 34.13));
-        metrics.add(Map.of("dataset", "Swedish", "algorithm", "Baseline BCS", "accuracy", 96.30, "precision", 96.66, "recall", 96.45, "f1", 96.04, "featuresSelected", 1018, "reductionRatio", 50.29));
+        metrics.add(Map.of("dataset", "Swedish", "algorithm", "Proposed GBCS", "accuracy", 96.89, "precision", 96.92,
+                "recall", 97.10, "f1", 96.63, "featuresSelected", 1349, "reductionRatio", 34.13));
+        metrics.add(Map.of("dataset", "Swedish", "algorithm", "Baseline BCS", "accuracy", 96.30, "precision", 96.66,
+                "recall", 96.45, "f1", 96.04, "featuresSelected", 1018, "reductionRatio", 50.29));
 
         // Flavia Dataset Metrics (K=7)
-        metrics.add(Map.of("dataset", "Flavia", "algorithm", "Proposed GBCS", "accuracy", 97.90, "precision", 94.38, "recall", 94.08, "f1", 93.97, "featuresSelected", 1353, "reductionRatio", 33.94));
-        metrics.add(Map.of("dataset", "Flavia", "algorithm", "Baseline BCS", "accuracy", 97.81, "precision", 93.97, "recall", 94.28, "f1", 93.87, "featuresSelected", 1042, "reductionRatio", 49.12));
+        metrics.add(Map.of("dataset", "Flavia", "algorithm", "Proposed GBCS", "accuracy", 97.90, "precision", 94.38,
+                "recall", 94.08, "f1", 93.97, "featuresSelected", 1353, "reductionRatio", 33.94));
+        metrics.add(Map.of("dataset", "Flavia", "algorithm", "Baseline BCS", "accuracy", 97.81, "precision", 93.97,
+                "recall", 94.28, "f1", 93.87, "featuresSelected", 1042, "reductionRatio", 49.12));
 
         // Philippine Dataset Metrics (K=9)
-        metrics.add(Map.of("dataset", "Philippine", "algorithm", "Proposed GBCS", "accuracy", 97.92, "precision", 98.01, "recall", 97.94, "f1", 97.81, "featuresSelected", 1369, "reductionRatio", 33.15));
-        metrics.add(Map.of("dataset", "Philippine", "algorithm", "Baseline BCS", "accuracy", 97.69, "precision", 97.80, "recall", 97.64, "f1", 97.55, "featuresSelected", 985, "reductionRatio", 51.91));
+        metrics.add(Map.of("dataset", "Philippine", "algorithm", "Proposed GBCS", "accuracy", 97.92, "precision", 98.01,
+                "recall", 97.94, "f1", 97.81, "featuresSelected", 1369, "reductionRatio", 33.15));
+        metrics.add(Map.of("dataset", "Philippine", "algorithm", "Baseline BCS", "accuracy", 97.69, "precision", 97.80,
+                "recall", 97.64, "f1", 97.55, "featuresSelected", 985, "reductionRatio", 51.91));
 
         return ResponseEntity.ok(metrics);
     }
@@ -251,40 +309,70 @@ public class PlantPredictionController {
     @GetMapping("/plants")
     public ResponseEntity<?> getPlantCatalog() {
         List<PlantSpeciesInfo> catalog = List.of(
-                new PlantSpeciesInfo("Fagus sylvatica", "Fagus sylvatica L.", "Swedish", "Fagaceae", "Europe", "European Beech leaf characterized by ovate shape, smooth margins, and distinct pinnate leaf venation.", List.of("Forestry", "Medicinal bark extract", "Timber")),
-                new PlantSpeciesInfo("Quercus robur", "Quercus robur L.", "Swedish", "Fagaceae", "Europe / Asia", "English Oak leaf with distinct lobed margins and sturdy leaf blade geometry.", List.of("Astringent medicine", "High-density timber", "Tannin production")),
-                new PlantSpeciesInfo("Acer palmatum", "Acer palmatum Thunb.", "Flavia", "Sapindaceae", "East Asia", "Japanese Maple featuring palmately lobed leaf structure with fine serrated margins.", List.of("Horticulture", "Traditional herbal tea", "Ornamental gardening")),
-                new PlantSpeciesInfo("Ginkgo biloba", "Ginkgo biloba L.", "Flavia", "Ginkgoaceae", "East Asia", "Unique fan-shaped leaf with dichotomous venation pattern preserved over millions of years.", List.of("Cognitive memory support", "Antioxidant extract", "Urban landscaping")),
-                new PlantSpeciesInfo("Senna alata", "Senna alata (L.) Roxb.", "Philippine", "Fabaceae", "Philippines / Southeast Asia", "Known locally as Akapulko. Pinnate compound leaves containing anti-fungal chrysophanic acid.", List.of("Anti-fungal skin treatment", "Traditional herbal medicine", "Natural ringworm remedy")),
-                new PlantSpeciesInfo("Leucaena leucocephala", "Leucaena leucocephala", "Philippine", "Fabaceae", "Philippines / Tropics", "Known locally as Ipil-ipil. Bipinnately compound leaves used for high-protein forage and soil restoration.", List.of("Nitrogen-fixing agroforestry", "Livestock forage", "Soil erosion control")),
-                new PlantSpeciesInfo("Momordica charantia", "Momordica charantia L.", "Philippine", "Cucurbitaceae", "Philippines", "Known locally as Ampalaya / Bitter Melon. Deeply palmately 5-7 lobed leaves rich in charantin.", List.of("Blood sugar regulation", "Traditional anti-diabetic tea", "Culinary vegetable"))
-        );
+                new PlantSpeciesInfo("Fagus sylvatica", "Fagus sylvatica L.", "Swedish", "Fagaceae", "Europe",
+                        "European Beech leaf characterized by ovate shape, smooth margins, and distinct pinnate leaf venation.",
+                        List.of("Forestry", "Medicinal bark extract", "Timber")),
+                new PlantSpeciesInfo("Quercus robur", "Quercus robur L.", "Swedish", "Fagaceae", "Europe / Asia",
+                        "English Oak leaf with distinct lobed margins and sturdy leaf blade geometry.",
+                        List.of("Astringent medicine", "High-density timber", "Tannin production")),
+                new PlantSpeciesInfo("Acer palmatum", "Acer palmatum Thunb.", "Flavia", "Sapindaceae", "East Asia",
+                        "Japanese Maple featuring palmately lobed leaf structure with fine serrated margins.",
+                        List.of("Horticulture", "Traditional herbal tea", "Ornamental gardening")),
+                new PlantSpeciesInfo("Ginkgo biloba", "Ginkgo biloba L.", "Flavia", "Ginkgoaceae", "East Asia",
+                        "Unique fan-shaped leaf with dichotomous venation pattern preserved over millions of years.",
+                        List.of("Cognitive memory support", "Antioxidant extract", "Urban landscaping")),
+                new PlantSpeciesInfo("Senna alata", "Senna alata (L.) Roxb.", "Philippine", "Fabaceae",
+                        "Philippines / Southeast Asia",
+                        "Known locally as Akapulko. Pinnate compound leaves containing anti-fungal chrysophanic acid.",
+                        List.of("Anti-fungal skin treatment", "Traditional herbal medicine",
+                                "Natural ringworm remedy")),
+                new PlantSpeciesInfo("Leucaena leucocephala", "Leucaena leucocephala", "Philippine", "Fabaceae",
+                        "Philippines / Tropics",
+                        "Known locally as Ipil-ipil. Bipinnately compound leaves used for high-protein forage and soil restoration.",
+                        List.of("Nitrogen-fixing agroforestry", "Livestock forage", "Soil erosion control")),
+                new PlantSpeciesInfo("Momordica charantia", "Momordica charantia L.", "Philippine", "Cucurbitaceae",
+                        "Philippines",
+                        "Known locally as Ampalaya / Bitter Melon. Deeply palmately 5-7 lobed leaves rich in charantin.",
+                        List.of("Blood sugar regulation", "Traditional anti-diabetic tea", "Culinary vegetable")));
         return ResponseEntity.ok(catalog);
     }
 
     @GetMapping("/convergence")
-    public ResponseEntity<?> getConvergenceData(@RequestParam(value = "dataset", defaultValue = "swedish") String dataset) {
+    public ResponseEntity<?> getConvergenceData(
+            @RequestParam(value = "dataset", defaultValue = "swedish") String dataset) {
         List<Map<String, Object>> points = new ArrayList<>();
         String ds = dataset.toLowerCase();
 
-        double[] gbcsSwedish = {0.877164, 0.883384, 0.883384, 0.883573, 0.884596, 0.885894, 0.885894, 0.885894, 0.886092, 0.886092, 0.887603, 0.888234, 0.888234, 0.888256, 0.888256, 0.888791, 0.888883, 0.889915, 0.889915, 0.890748, 0.891162};
-        double[] bcsSwedish = {0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159};
+        double[] gbcsSwedish = { 0.877164, 0.883384, 0.883384, 0.883573, 0.884596, 0.885894, 0.885894, 0.885894,
+                0.886092, 0.886092, 0.887603, 0.888234, 0.888234, 0.888256, 0.888256, 0.888791, 0.888883, 0.889915,
+                0.889915, 0.890748, 0.891162 };
+        double[] bcsSwedish = { 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159,
+                0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159,
+                0.961159, 0.961159, 0.961159 };
 
-        double[] gbcsFlavia = {0.870288, 0.878577, 0.878577, 0.878577, 0.880282, 0.880282, 0.880282, 0.880687, 0.881862, 0.883145, 0.883347, 0.883347, 0.883347, 0.883644, 0.884028, 0.884028, 0.885465, 0.885743, 0.885833, 0.885833, 0.886053};
-        double[] bcsFlavia = {0.949878, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205};
+        double[] gbcsFlavia = { 0.870288, 0.878577, 0.878577, 0.878577, 0.880282, 0.880282, 0.880282, 0.880687,
+                0.881862, 0.883145, 0.883347, 0.883347, 0.883347, 0.883644, 0.884028, 0.884028, 0.885465, 0.885743,
+                0.885833, 0.885833, 0.886053 };
+        double[] bcsFlavia = { 0.949878, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205,
+                0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205,
+                0.951205, 0.951205 };
 
-        double[] gbcsPhilippine = {0.882997, 0.888598, 0.888598, 0.889582, 0.889582, 0.891674, 0.891674, 0.891674, 0.892708, 0.892708, 0.892708, 0.892708, 0.892708, 0.893084, 0.893376, 0.895649, 0.895649, 0.895649, 0.895649, 0.895649, 0.895649};
-        double[] bcsPhilippine = {0.967935, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376};
+        double[] gbcsPhilippine = { 0.882997, 0.888598, 0.888598, 0.889582, 0.889582, 0.891674, 0.891674, 0.891674,
+                0.892708, 0.892708, 0.892708, 0.892708, 0.892708, 0.893084, 0.893376, 0.895649, 0.895649, 0.895649,
+                0.895649, 0.895649, 0.895649 };
+        double[] bcsPhilippine = { 0.967935, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376,
+                0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376,
+                0.972376, 0.972376, 0.972376 };
 
-        double[] gbcsArr = ds.contains("flavia") ? gbcsFlavia : (ds.contains("philippine") ? gbcsPhilippine : gbcsSwedish);
+        double[] gbcsArr = ds.contains("flavia") ? gbcsFlavia
+                : (ds.contains("philippine") ? gbcsPhilippine : gbcsSwedish);
         double[] bcsArr = ds.contains("flavia") ? bcsFlavia : (ds.contains("philippine") ? bcsPhilippine : bcsSwedish);
 
         for (int i = 0; i < gbcsArr.length; i++) {
             points.add(Map.of(
                     "iteration", i,
                     "gbcsFitness", gbcsArr[i],
-                    "bcsFitness", bcsArr[i]
-            ));
+                    "bcsFitness", bcsArr[i]));
         }
 
         return ResponseEntity.ok(points);
@@ -307,21 +395,28 @@ public class PlantPredictionController {
             }
             proc.waitFor();
 
-            String jsonOutput = sb.toString();
-            if (jsonOutput.startsWith("{")) {
-                jsonOutput = jsonOutput.substring(1, jsonOutput.length() - 1);
-                String[] pairs = jsonOutput.split(",");
+            String rawStr = sb.toString();
+            int firstBrace = rawStr.indexOf("{");
+            int lastBrace = rawStr.lastIndexOf("}");
+
+            if (firstBrace != -1 && lastBrace != -1 && lastBrace > firstBrace) {
+                String jsonContent = rawStr.substring(firstBrace + 1, lastBrace);
+                String[] pairs = jsonContent.split(",");
                 for (String pair : pairs) {
                     String[] kv = pair.split(":");
                     if (kv.length == 2) {
                         String k = kv[0].replace("\"", "").trim();
-                        double v = Double.parseDouble(kv[1].trim());
-                        map.put(k, v);
+                        try {
+                            double v = Double.parseDouble(kv[1].trim());
+                            map.put(k, v);
+                        } catch (NumberFormatException ignored) {}
                     }
                 }
+            } else {
+                System.err.println("⚠️ Python output did not contain valid JSON bounds: " + rawStr);
             }
         } catch (Exception e) {
-            System.err.println("Script feature extraction fallback: " + e.getMessage());
+            System.err.println("❌ Script feature extraction error: " + e.getMessage());
         }
         return map;
     }

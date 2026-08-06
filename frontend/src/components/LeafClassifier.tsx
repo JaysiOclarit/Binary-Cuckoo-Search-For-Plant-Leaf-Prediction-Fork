@@ -5,12 +5,14 @@ import { PredictionResult } from '../types';
 
 interface LeafClassifierProps {
   selectedDataset: string;
+  setSelectedDataset: (ds: string) => void;
   onClassifyImage: (file: File, dataset: string, algorithm: string) => Promise<PredictionResult>;
   onClassifyPreset: (presetName: string, dataset: string, algorithm: string) => Promise<PredictionResult>;
 }
 
 export const LeafClassifier: React.FC<LeafClassifierProps> = ({
   selectedDataset,
+  setSelectedDataset,
   onClassifyImage,
   onClassifyPreset,
 }) => {
@@ -134,28 +136,45 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
           </p>
         </div>
 
-        {/* Algorithm Toggle */}
-        <div className="flex items-center space-x-2 bg-slate-900/90 p-1 rounded-xl border border-slate-800 self-start">
-          <button
-            onClick={() => setAlgorithm('gbcs')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              algorithm === 'gbcs'
-                ? 'bg-emerald-500 text-slate-950 shadow'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            Proposed GBCS (Genetic Binary)
-          </button>
-          <button
-            onClick={() => setAlgorithm('bcs')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              algorithm === 'bcs'
-                ? 'bg-emerald-500 text-slate-950 shadow'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            Baseline BCS
-          </button>
+        {/* Controls: Target Dataset & Algorithm Toggle */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Target Dataset Selector */}
+          <div className="flex items-center space-x-2 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800">
+            <span className="text-xs font-semibold text-slate-400 pl-2">Target Dataset:</span>
+            <select
+              value={selectedDataset}
+              onChange={(e) => setSelectedDataset(e.target.value)}
+              className="bg-slate-950 text-emerald-400 text-xs font-bold border border-slate-700/80 rounded-lg px-3 py-1 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+            >
+              <option value="swedish">Swedish Leaf (15 Species)</option>
+              <option value="flavia">Flavia Leaf (32 Species)</option>
+              <option value="philippine">Philippine Medicinal (40 Species)</option>
+            </select>
+          </div>
+
+          {/* Algorithm Toggle */}
+          <div className="flex items-center space-x-2 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+            <button
+              onClick={() => setAlgorithm('gbcs')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                algorithm === 'gbcs'
+                  ? 'bg-emerald-500 text-slate-950 shadow'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Proposed GBCS (Genetic Binary)
+            </button>
+            <button
+              onClick={() => setAlgorithm('bcs')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                algorithm === 'bcs'
+                  ? 'bg-emerald-500 text-slate-950 shadow'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Baseline BCS
+            </button>
+          </div>
         </div>
       </div>
 
