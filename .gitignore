@@ -1,0 +1,28 @@
+# Maven build outputs
+backend/target/
+target/
+*.class
+
+# Node / Frontend build outputs
+frontend/node_modules/
+frontend/dist/
+node_modules/
+
+# Python cache & venv
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# IDE files
+.idea/
+*.iws
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+
+# OS temporary files
+.DS_Store
+Thumbs.db

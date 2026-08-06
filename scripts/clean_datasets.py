@@ -65,7 +65,7 @@ def main():
     print("      PYTHON PLANT LEAF DATASET CLASS LABEL CLEANER               ")
     print("=================================================================\n")
 
-    base_dir = Path(__file__).parent
+    base_dir = Path(__file__).parent.parent
     
     # List of candidate paths to clean
     target_files = [

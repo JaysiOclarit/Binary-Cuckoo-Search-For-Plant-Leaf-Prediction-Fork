@@ -1,0 +1,45 @@
+=================================================================================
+               EXPLORATORY DATA ANALYSIS (EDA) REPORT                            
+               (Section 2.2: Data Understanding & Preprocessing)                
+=================================================================================
+
+---------------------------------------------------------------------------------
+DATASET: Flavia (Flavia Leaf data.csv)
+---------------------------------------------------------------------------------
+  - Total Samples: 1907
+  - Total Species Classes: 33
+  - Min Class Count: 1 | Max Class Count: 77 | Mean Class Count: 57.79
+  - Class Imbalance Ratio (Max/Min): 77.00:1 (Imbalanced)
+  - Extracted Inception V3 Features (|F|): 2048
+  - Overall Average Feature Correlation (rho_avg): 0.1489
+  - Highly Correlated Feature Pairs (|r| > 0.85): 148 pairs
+
+---------------------------------------------------------------------------------
+DATASET: Philippine (Philippine Leaf data.csv)
+---------------------------------------------------------------------------------
+  - Total Samples: 4971
+  - Total Species Classes: 40
+  - Min Class Count: 100 | Max Class Count: 171 | Mean Class Count: 124.28
+  - Class Imbalance Ratio (Max/Min): 1.71:1 (Imbalanced)
+  - Extracted Inception V3 Features (|F|): 2048
+  - Overall Average Feature Correlation (rho_avg): 0.1253
+  - Highly Correlated Feature Pairs (|r| > 0.85): 21 pairs
+
+---------------------------------------------------------------------------------
+DATASET: Swedish (Swedish Leaf data.csv)
+---------------------------------------------------------------------------------
+  - Total Samples: 1125
+  - Total Species Classes: 15
+  - Min Class Count: 75 | Max Class Count: 75 | Mean Class Count: 75.00
+  - Class Imbalance Ratio (Max/Min): 1.00:1 (Perfectly Balanced)
+  - Extracted Inception V3 Features (|F|): 2048
+  - Overall Average Feature Correlation (rho_avg): 0.1611
+  - Highly Correlated Feature Pairs (|r| > 0.85): 66 pairs
+
+=================================================================================
+SUMMARY OF EDA FINDINGS FOR THESIS METHODOLOGY:
+  1. Class Imbalance: Philippine Medicinal dataset exhibits natural imbalance (ratio ~1:1.71),
+     justifying the use of Macro F1-Score, Precision, and Recall.
+  2. Redundancy & Curse of Dimensionality: High correlation pairs (rho > 0.85) confirm
+     substantial feature overlap, validating the Proposed Correlation-Aware Fitness Function.
+=================================================================================
