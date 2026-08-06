@@ -1,6 +1,6 @@
 # PhytoCuckoo: Plant Leaf Prediction & GBCS Feature Selection Platform 🍃
 
-> **Thesis Title**: Binary Cuckoo Search (BCS) & Genetic Binary Cuckoo Search (GBCS) Feature Selection for High-Dimensional Plant Leaf Classification  
+> **Thesis Title**: Optimizing Cuckoo Search using Genetic Operators and Correlation-Aware Fitness for Plant Leaf Classification 
 > **Evaluated Datasets**: Swedish Leaf Dataset (15 Species), Flavia Leaf Dataset (32 Species), Philippine Native & Medicinal Leaf Dataset (40 Species)
 
 ---
