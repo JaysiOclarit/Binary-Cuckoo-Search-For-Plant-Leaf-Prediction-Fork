@@ -31,7 +31,7 @@ export const SideBySideBenchmark: React.FC<SideBySideBenchmarkProps> = ({
     }
   };
 
-  // Dynamic Inception-V2 Deep Feature Activation Weighting across CNN Bottleneck Subspaces (computed directly from model feature ID maps)
+  // Dynamic Inception-V3 Deep Feature Activation Weighting across CNN Bottleneck Subspaces (computed directly from model feature ID maps)
   const radarData = data?.radarProfile || [
     { category: 'Deep Conv Subspace A', GBCS: 88.0, BCS: 62.0 },
     { category: 'Deep Conv Subspace B', GBCS: 94.0, BCS: 70.0 },

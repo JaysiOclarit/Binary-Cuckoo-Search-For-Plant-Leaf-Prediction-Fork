@@ -29,7 +29,7 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
       dataset: 'swedish',
       label: 'Swedish Leaf #1',
       bgGradient: 'from-amber-700/40 to-emerald-900/60',
-      description: 'European Beech leaf with Inception-V2 2048-dim representation',
+      description: 'European Beech leaf with Inception-V3 2048-dim representation',
     },
     {
       name: 'Quercus robur',
@@ -127,10 +127,10 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
         <div>
           <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
             <Leaf className="w-6 h-6 text-emerald-400" />
-            <span>Inception-V2 Leaf Classification Workbench</span>
+            <span>Inception-V3 Leaf Classification Workbench</span>
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Extract 2048-dimensional Inception-V2 CNN features & evaluate through Tribuo machine learning models.
+            Extract 2048-dimensional Inception-V3 CNN features & evaluate through Tribuo machine learning models.
           </p>
         </div>
 
@@ -191,7 +191,7 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
                   <p className="text-xs font-semibold text-slate-200 mb-1">
                     Drag and drop leaf image here, or <span className="text-emerald-400">browse</span>
                   </p>
-                  <p className="text-[11px] text-slate-400">Inception-V2 Deep CNN Feature Extraction (2048-dim vector)</p>
+                  <p className="text-[11px] text-slate-400">Inception-V3 Deep CNN Feature Extraction (2048-dim vector)</p>
                 </div>
               )}
 
@@ -221,7 +221,7 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4" />
-                      <span>Run Inception-V2 Classification</span>
+                      <span>Run Inception-V3 Classification</span>
                     </>
                   )}
                 </button>
@@ -290,7 +290,7 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
                   <Leaf className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-200">Running Inception-V2 Deep Feature Extraction...</p>
+                  <p className="text-xs font-bold text-slate-200">Running Inception-V3 Deep Feature Extraction...</p>
                   <p className="text-[11px] text-slate-400 mt-1">Inception CNN Bottleneck Layer Representation (2048-dim vector)</p>
                 </div>
               </div>
@@ -314,7 +314,7 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
                   </div>
                   <div className="text-xs text-slate-400 flex items-center space-x-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Inception-V2 Deep Vector Verified by Tribuo</span>
+                    <span>Inception-V3 Deep Vector Verified by Tribuo</span>
                   </div>
                 </div>
 

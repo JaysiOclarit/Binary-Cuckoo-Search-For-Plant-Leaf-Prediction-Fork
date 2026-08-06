@@ -8,7 +8,7 @@
 ## 🌟 Executive Summary
 
 **PhytoCuckoo** is an interactive web platform and research pipeline built to present the **Genetic Binary Cuckoo Search (GBCS)** feature selection algorithm. The system combines:
-1. **Inception-V2 Deep CNN Feature Extraction**: Processes uploaded leaf photos and extracts 2048-dimensional feature vectors.
+1. **Inception-V3 Deep CNN Feature Extraction**: Processes uploaded leaf photos and extracts 2048-dimensional feature vectors.
 2. **Oracle Tribuo ML Engine**: Java Spring Boot backend executing Factorization Machines (FM) & Bagging Ensemble models trained on feature-selected datasets.
 3. **Side-by-Side Benchmark Workbench**: Evaluates Baseline BCS vs. Proposed GBCS in real time.
 4. **Interactive Cuckoo Simulator**: Animates Lévy flight dynamics and live fitness convergence curves ($f(x)$ over 30 iterations).
@@ -26,7 +26,7 @@ Binary-Cuckoo-Search-For-Plant-Leaf-Prediction-Fork/
 │
 ├── 🧠 backend/                               # Java Spring Boot Server & ML Core
 │   ├── extractor/                            # Feature Extractor Module
-│   │   ├── extract_features.py               # Inception-V2 Deep CNN Feature Extractor
+│   │   ├── extract_features.py               # Inception-V3 Deep CNN Feature Extractor
 │   │   └── requirements.txt                  # Python Extractor Dependencies
 │   ├── models/                               # Serialized Oracle Tribuo Models (.ser)
 │   │   ├── Swedish_BCS_Model.ser

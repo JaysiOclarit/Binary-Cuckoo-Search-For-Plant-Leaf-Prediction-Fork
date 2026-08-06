@@ -21,10 +21,10 @@ def extract_inception_v2_features(image_path: str, feature_count: int = 2048, da
         from PIL import Image
 
         if os.path.exists(image_path):
-            # Load pretrained Inception model backbone
+            # Load pretrained Inception-V3 CNN model backbone (Section 2.3.1 - 2,048-dimensional feature embedding)
             weights = models.Inception_V3_Weights.DEFAULT
             model = models.inception_v3(weights=weights, transform_input=False)
-            model.fc = torch.nn.Identity() # Remove classifier layer -> Output 2048-dim bottleneck
+            model.fc = torch.nn.Identity() # Bottleneck output layer -> 2048-dim feature vector
             model.eval()
 
             # Inception standard 299x299 image preprocessing
@@ -91,7 +91,7 @@ def extract_inception_v2_features(image_path: str, feature_count: int = 2048, da
     return features
 
 def main():
-    parser = argparse.ArgumentParser(description="Inception-V2 Deep Feature Extractor for Plant Leaf Prediction")
+    parser = argparse.ArgumentParser(description="Inception-V3 Deep Feature Extractor for Plant Leaf Prediction")
     parser.add_argument("--image", type=str, required=True, help="Path to leaf image file")
     parser.add_argument("--dataset", type=str, default="swedish", help="Dataset target: swedish, flavia, philippine")
     args = parser.parse_args()
