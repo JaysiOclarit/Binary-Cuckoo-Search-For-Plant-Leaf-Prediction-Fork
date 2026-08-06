@@ -86,10 +86,13 @@ public class MainClass_GBCS_Bagging {
             // Save trained model for web API deployment (e.g.,
             // "Swedish_Plant_Model_gbcs.ser")
             String outputModelName = datasetName + "_Plant_Model_gbcs.ser";
-            System.out.println("Saving model to: " + outputModelName);
-            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outputModelName))) {
+            java.io.File modelsDir = ModelExporter.getModelsDir();
+            java.io.File targetFile = new java.io.File(modelsDir, outputModelName);
+
+            System.out.println("Saving model to: " + targetFile.getPath());
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(targetFile))) {
                 oos.writeObject(trainedModel);
-                System.out.println("SUCCESS: Model saved as '" + outputModelName + "' in project root.");
+                System.out.println("SUCCESS: Model saved as '" + targetFile.getPath() + "'.");
             } catch (IOException e) {
                 System.err.println("Error saving model: " + e.getMessage());
             }

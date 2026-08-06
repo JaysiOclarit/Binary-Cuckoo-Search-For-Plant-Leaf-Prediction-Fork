@@ -76,11 +76,14 @@ public class MainClass_Bagging {
 
             // Save trained model (e.g., "Swedish_Plant_Model_bcs.ser")
             String outputModelName = datasetName + "_Plant_Model_bcs.ser";
-            System.out.println("Saving model to: " + outputModelName);
+            java.io.File modelsDir = ModelExporter.getModelsDir();
+            java.io.File targetFile = new java.io.File(modelsDir, outputModelName);
+
+            System.out.println("Saving model to: " + targetFile.getPath());
             try (java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(
-                    new java.io.FileOutputStream(outputModelName))) {
+                    new java.io.FileOutputStream(targetFile))) {
                 oos.writeObject(trainedModel);
-                System.out.println("SUCCESS: Model saved as '" + outputModelName + "' in project root.");
+                System.out.println("SUCCESS: Model saved as '" + targetFile.getPath() + "'.");
             } catch (java.io.IOException e) {
                 System.err.println("Error saving model: " + e.getMessage());
             }

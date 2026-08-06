@@ -96,20 +96,26 @@ public class MainClass_EDA_Analysis {
         // 1. Print report to console
         System.out.println(report.toString());
 
-        // 2. Save text report file
-        try (PrintWriter pw = new PrintWriter(new FileWriter("EDA_Analysis_Report.txt"))) {
+        // 2. Save text report & CSV into Results directory
+        File resultsDir = new File("Results");
+        if (!resultsDir.exists()) resultsDir = new File("../Results");
+        if (!resultsDir.exists()) resultsDir.mkdirs();
+
+        File reportFile = new File(resultsDir, "EDA_Analysis_Report.txt");
+        File csvFile = new File(resultsDir, "Class_Distribution_Analysis.csv");
+
+        try (PrintWriter pw = new PrintWriter(new FileWriter(reportFile))) {
             pw.print(report.toString());
         }
 
-        // 3. Export class distribution CSV for plotting bar charts
-        try (PrintWriter pw = new PrintWriter(new FileWriter("Class_Distribution_Analysis.csv"))) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(csvFile))) {
             for (String row : csvDistributionRows) {
                 pw.println(row);
             }
         }
 
         System.out.println(
-                "SUCCESS: EDA Report saved to 'EDA_Analysis_Report.txt' and 'Class_Distribution_Analysis.csv'");
+                "SUCCESS: EDA Report saved to '" + reportFile.getPath() + "' and '" + csvFile.getPath() + "'");
     }
 
     private static void analyzeClassDistribution(String datasetPrefix, Dataset<Label> dataset, StringBuilder report,

@@ -207,16 +207,23 @@ public class MainClass_All_KFold_CrossValidation {
         System.out.println("=========================================================================================");
 
         // 6. Save all results to CSV File
-        String csvFileName = "All_KFold_CrossValidation_Results.csv";
-        exportToCSV(csvFileName, allResults);
+        // 6. Export results to CSV file in Results directory
+        File resultsDir = new File("Results");
+        if (!resultsDir.exists()) resultsDir = new File("../Results");
+        if (!resultsDir.exists()) resultsDir.mkdirs();
+
+        File csvFile = new File(resultsDir, "All_KFold_CrossValidation_Results.csv");
+        File textLogFile = new File(resultsDir, "CV_Manual_Results.txt");
+
+        exportToCSV(csvFile.getPath(), allResults);
 
         // 7. Append to CV_Manual_Results.txt text log
-        exportToTextLog("CV_Manual_Results.txt", allResults);
+        exportToTextLog(textLogFile.getPath(), allResults);
 
         System.out.println("\n=================================================================");
         System.out.println("SUCCESS: All K-Fold Cross-Validation evaluations completed!");
-        System.out.println("Results exported to CSV file: " + csvFileName);
-        System.out.println("Results appended to text log: CV_Manual_Results.txt");
+        System.out.println("Results exported to CSV file: " + csvFile.getPath());
+        System.out.println("Results appended to text log: " + textLogFile.getPath());
         System.out.println("=================================================================");
     }
 

@@ -81,9 +81,14 @@ public class MainClass_CrossValidation {
         System.out.println("The average F1-Score is : " + finalF1 + "%");
         System.out.println("The average precision is : " + finalPrecision + "%");
 
-        // 2. Output to Text File
-        // Setting FileWriter to 'true' ensures it appends rather than overwriting
-        try (FileWriter fw = new FileWriter("CV_Manual_Results.txt", true);
+        // 2. Output to Text File in Results directory
+        java.io.File resultsDir = new java.io.File("Results");
+        if (!resultsDir.exists()) resultsDir = new java.io.File("../Results");
+        if (!resultsDir.exists()) resultsDir.mkdirs();
+
+        java.io.File cvFile = new java.io.File(resultsDir, "CV_Manual_Results.txt");
+
+        try (FileWriter fw = new FileWriter(cvFile, true);
                 PrintWriter pw = new PrintWriter(fw)) {
 
             pw.println("=========================================");
@@ -95,7 +100,7 @@ public class MainClass_CrossValidation {
             pw.println("Average Precision: " + finalPrecision + "%");
             pw.println("=========================================\n");
 
-            System.out.println("\nSUCCESS: Results successfully appended to 'CV_Manual_Results.txt'");
+            System.out.println("\nSUCCESS: Results successfully appended to '" + cvFile.getPath() + "'");
 
         } catch (IOException e) {
             System.err.println("Error writing to file: " + e.getMessage());
