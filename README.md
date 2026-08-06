@@ -95,7 +95,7 @@ The metrics below are pulled directly from `Results/All_KFold_CrossValidation_Re
 
 ### 2. Exploratory Data Analysis (EDA) Characteristics
 
-| Dataset | Total Samples | Species Classes | Class Imbalance Ratio | Initial Features | Avg Correlation ($\bar{\rho}$) | Highly Correlated Pairs ($|r| > 0.85$) |
+| Dataset | Total Samples | Species Classes | Class Imbalance Ratio | Initial Features | Avg Correlation ($\bar{\rho}$) | Highly Correlated Pairs ($&#124;r&#124; > 0.85$) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Swedish Leaf** | 1,125 | 15 | 1.00 : 1 | 2,048 | 0.1611 | 66 pairs |
 | **Flavia Leaf** | 1,907 | 33 | 77.00 : 1 | 2,048 | 0.1489 | 148 pairs |
