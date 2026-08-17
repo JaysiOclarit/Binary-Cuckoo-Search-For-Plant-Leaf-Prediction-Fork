@@ -26,3 +26,21 @@ venv/
 # OS temporary files
 .DS_Store
 Thumbs.db
+
+# Virtual Environments
+manim_env/
+.venv_manim/
+venv/
+.venv/
+env/
+
+# Manim Rendering Output & Cache
+media/
+**/media/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
