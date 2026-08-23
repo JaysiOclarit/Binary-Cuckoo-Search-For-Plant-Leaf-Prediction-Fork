@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
-import { Hero } from './components/Hero';
 import { LeafClassifier } from './components/LeafClassifier';
 import { SideBySideBenchmark } from './components/SideBySideBenchmark';
 import { CuckooSimulator } from './components/CuckooSimulator';
-import { BotanicalEncyclopedia } from './components/BotanicalEncyclopedia';
 import { ThesisAnalytics } from './components/ThesisAnalytics';
-import { DefenseWizard } from './components/DefenseWizard';
-import { PredictionResult, ComparisonResult, AnalyticsMetric, PlantSpecies, ConvergencePoint } from './types';
+import { PredictionResult, ComparisonResult, AnalyticsMetric, ConvergencePoint } from './types';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('classifier');
@@ -64,20 +61,24 @@ export const App: React.FC = () => {
       const res = await fetch(`/api/compare?dataset=${dataset}`, { method: 'POST' });
       if (res.ok) return await res.json();
     } catch (e) {
-      console.warn('Using simulation data for comparison');
+      console.warn('Using fallback data for comparison');
     }
+
+    const ds = dataset.toLowerCase();
+    const isPhilippine = ds.includes('philippine');
+    const isFlavia = ds.includes('flavia');
 
     return {
       dataset,
-      bcsPredictedClass: 'Fagus sylvatica',
-      bcsConfidence: 0.9420,
-      bcsFeatureCount: 856,
-      bcsReductionRatio: 58.2,
-      gbcsPredictedClass: 'Fagus sylvatica',
-      gbcsConfidence: 0.9845,
-      gbcsFeatureCount: 412,
-      gbcsReductionRatio: 79.88,
-      winner: 'Proposed GBCS (Higher Accuracy & Feature Reduction)',
+      bcsPredictedClass: isPhilippine ? 'Senna alata' : (isFlavia ? 'Acer palmatum' : 'Fagus sylvatica'),
+      bcsConfidence: isPhilippine ? 0.9679 : (isFlavia ? 0.9498 : 0.9611),
+      bcsFeatureCount: isPhilippine ? 985 : (isFlavia ? 1042 : 1018),
+      bcsReductionRatio: isPhilippine ? 51.91 : (isFlavia ? 49.12 : 50.29),
+      gbcsPredictedClass: isPhilippine ? 'Senna alata' : (isFlavia ? 'Acer palmatum' : 'Fagus sylvatica'),
+      gbcsConfidence: isPhilippine ? 0.9892 : (isFlavia ? 0.9810 : 0.9845),
+      gbcsFeatureCount: isPhilippine ? 1369 : (isFlavia ? 1353 : 1349),
+      gbcsReductionRatio: isPhilippine ? 33.15 : (isFlavia ? 33.94 : 34.13),
+      winner: 'Proposed GBCS (Higher Accuracy & Superior Feature Representation)',
     };
   };
 
@@ -90,31 +91,12 @@ export const App: React.FC = () => {
     }
 
     return [
-      { dataset: 'Swedish', algorithm: 'Proposed GBCS', accuracy: 98.45, precision: 98.20, recall: 98.45, f1: 98.32, featuresSelected: 412, reductionRatio: 79.88 },
-      { dataset: 'Swedish', algorithm: 'Baseline BCS', accuracy: 94.20, precision: 93.85, recall: 94.20, f1: 94.02, featuresSelected: 856, reductionRatio: 58.20 },
-      { dataset: 'Flavia', algorithm: 'Proposed GBCS', accuracy: 97.80, precision: 97.65, recall: 97.80, f1: 97.72, featuresSelected: 520, reductionRatio: 74.61 },
-      { dataset: 'Flavia', algorithm: 'Baseline BCS', accuracy: 93.10, precision: 92.80, recall: 93.10, f1: 92.95, featuresSelected: 910, reductionRatio: 55.56 },
-      { dataset: 'Philippine', algorithm: 'Proposed GBCS', accuracy: 96.90, precision: 96.50, recall: 96.90, f1: 96.70, featuresSelected: 380, reductionRatio: 81.44 },
-      { dataset: 'Philippine', algorithm: 'Baseline BCS', accuracy: 91.50, precision: 91.10, recall: 91.50, f1: 91.30, featuresSelected: 780, reductionRatio: 61.91 },
-    ];
-  };
-
-  const handleFetchPlants = async (): Promise<PlantSpecies[]> => {
-    try {
-      const res = await fetch('/api/plants');
-      if (res.ok) return await res.json();
-    } catch (e) {
-      console.warn('Plants catalog fallback');
-    }
-
-    return [
-      { name: 'Fagus sylvatica', scientificName: 'Fagus sylvatica L.', dataset: 'Swedish', family: 'Fagaceae', region: 'Europe', description: 'European Beech leaf characterized by ovate shape, smooth margins, and distinct pinnate leaf venation.', uses: ['Forestry', 'Medicinal bark extract', 'Timber'] },
-      { name: 'Quercus robur', scientificName: 'Quercus robur L.', dataset: 'Swedish', family: 'Fagaceae', region: 'Europe / Asia', description: 'English Oak leaf with distinct lobed margins and sturdy leaf blade geometry.', uses: ['Astringent medicine', 'High-density timber', 'Tannin production'] },
-      { name: 'Acer palmatum', scientificName: 'Acer palmatum Thunb.', dataset: 'Flavia', family: 'Sapindaceae', region: 'East Asia', description: 'Japanese Maple featuring palmately lobed leaf structure with fine serrated margins.', uses: ['Horticulture', 'Traditional herbal tea', 'Ornamental gardening'] },
-      { name: 'Ginkgo biloba', scientificName: 'Ginkgo biloba L.', dataset: 'Flavia', family: 'Ginkgoaceae', region: 'East Asia', description: 'Unique fan-shaped leaf with dichotomous venation pattern preserved over millions of years.', uses: ['Cognitive memory support', 'Antioxidant extract', 'Urban landscaping'] },
-      { name: 'Senna alata', scientificName: 'Senna alata (L.) Roxb.', dataset: 'Philippine', family: 'Fabaceae', region: 'Philippines', description: 'Known locally as Akapulko. Pinnate compound leaves containing anti-fungal chrysophanic acid.', uses: ['Anti-fungal skin treatment', 'Traditional herbal medicine', 'Natural ringworm remedy'] },
-      { name: 'Leucaena leucocephala', scientificName: 'Leucaena leucocephala', dataset: 'Philippine', family: 'Fabaceae', region: 'Philippines', description: 'Known locally as Ipil-ipil. Bipinnately compound leaves used for high-protein forage and soil restoration.', uses: ['Nitrogen-fixing agroforestry', 'Livestock forage', 'Soil erosion control'] },
-      { name: 'Momordica charantia', scientificName: 'Momordica charantia L.', dataset: 'Philippine', family: 'Cucurbitaceae', region: 'Philippines', description: 'Known locally as Ampalaya / Bitter Melon. Deeply palmately 5-7 lobed leaves rich in charantin.', uses: ['Blood sugar regulation', 'Traditional anti-diabetic tea', 'Culinary vegetable'] },
+      { dataset: 'Swedish', algorithm: 'Proposed GBCS', accuracy: 96.89, precision: 96.92, recall: 97.10, f1: 96.63, featuresSelected: 1349, reductionRatio: 34.13 },
+      { dataset: 'Swedish', algorithm: 'Baseline BCS', accuracy: 96.30, precision: 96.66, recall: 96.45, f1: 96.04, featuresSelected: 1018, reductionRatio: 50.29 },
+      { dataset: 'Flavia', algorithm: 'Proposed GBCS', accuracy: 97.90, precision: 94.38, recall: 94.08, f1: 93.97, featuresSelected: 1353, reductionRatio: 33.94 },
+      { dataset: 'Flavia', algorithm: 'Baseline BCS', accuracy: 97.81, precision: 93.97, recall: 94.28, f1: 93.87, featuresSelected: 1042, reductionRatio: 49.12 },
+      { dataset: 'Philippine', algorithm: 'Proposed GBCS', accuracy: 97.92, precision: 98.01, recall: 97.94, f1: 97.81, featuresSelected: 1369, reductionRatio: 33.15 },
+      { dataset: 'Philippine', algorithm: 'Baseline BCS', accuracy: 97.69, precision: 97.80, recall: 97.64, f1: 97.55, featuresSelected: 985, reductionRatio: 51.91 },
     ];
   };
 
@@ -156,12 +138,7 @@ export const App: React.FC = () => {
         apiStatus={apiStatus}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-8 space-y-10">
-        <Hero
-          onStartClassification={() => setActiveTab('classifier')}
-          onStartBenchmark={() => setActiveTab('benchmark')}
-        />
-
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6">
         {activeTab === 'classifier' && (
           <LeafClassifier
             selectedDataset={selectedDataset}
@@ -185,26 +162,18 @@ export const App: React.FC = () => {
           />
         )}
 
-        {activeTab === 'encyclopedia' && (
-          <BotanicalEncyclopedia onFetchPlants={handleFetchPlants} />
-        )}
-
         {activeTab === 'analytics' && (
           <ThesisAnalytics onFetchAnalytics={handleFetchAnalytics} />
         )}
-
-        {activeTab === 'defense' && (
-          <DefenseWizard onNavigateToTab={setActiveTab} />
-        )}
       </main>
 
-      <footer className="glass-panel border-t border-slate-800/80 py-6 mt-12 text-center text-xs text-slate-400">
+      <footer className="glass-panel border-t border-slate-800/80 py-4 mt-8 text-center text-xs text-slate-400">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div>
-            🌱 <strong className="text-slate-200">PhytoCuckoo System</strong> &copy; {new Date().getFullYear()} — Genetic Binary Cuckoo Search (GBCS) Thesis Project
+            🌱 <strong className="text-slate-200">PhytoCuckoo System</strong> — Genetic Binary Cuckoo Search (GBCS) Thesis Evaluation Workbench
           </div>
-          <div className="text-slate-400">
-            Powered by Java Spring Boot, Oracle Tribuo ML & OpenCV Feature Extraction
+          <div className="text-slate-500 text-[11px]">
+            Inception-V3 Feature Extraction &bull; Java Spring Boot &bull; Oracle Tribuo ML
           </div>
         </div>
       </footer>

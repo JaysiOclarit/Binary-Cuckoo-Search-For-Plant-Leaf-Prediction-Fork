@@ -37,16 +37,6 @@ export interface AnalyticsMetric {
   reductionRatio: number;
 }
 
-export interface PlantSpecies {
-  name: string;
-  scientificName: string;
-  dataset: string;
-  family: string;
-  region: string;
-  description: string;
-  uses: string[];
-}
-
 export interface ConvergencePoint {
   iteration: number;
   gbcsFitness: number;

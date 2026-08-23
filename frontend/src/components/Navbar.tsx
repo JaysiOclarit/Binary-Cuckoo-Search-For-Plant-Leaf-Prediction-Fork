@@ -1,5 +1,5 @@
 import React from 'react';
-import { Leaf, Activity, Layers, Database, BarChart3, Presentation, Radio } from 'lucide-react';
+import { Leaf, Activity, Layers, BarChart3, Radio } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: string;
@@ -19,10 +19,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   const navItems = [
     { id: 'classifier', label: 'Leaf Classifier', icon: Leaf },
     { id: 'benchmark', label: 'BCS vs GBCS Benchmark', icon: Layers },
-    { id: 'simulator', label: 'Cuckoo Simulator', icon: Activity },
-    { id: 'encyclopedia', label: 'Botanical Catalog', icon: Database },
-    { id: 'analytics', label: 'Thesis Analytics', icon: BarChart3 },
-    { id: 'defense', label: 'Defense Presentation', icon: Presentation },
+    { id: 'simulator', label: 'Convergence Dynamics', icon: Activity },
+    { id: 'analytics', label: 'Cross-Validation Analytics', icon: BarChart3 },
   ];
 
   return (
@@ -39,10 +37,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center space-x-2">
               <span className="font-extrabold text-lg tracking-tight text-white">PhytoCuckoo</span>
               <span className="px-2 py-0.5 text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full">
-                GBCS v2.0
+                GBCS System
               </span>
             </div>
-            <p className="text-xs text-slate-400">Binary Cuckoo Search Plant Leaf Classification</p>
+            <p className="text-xs text-slate-400">Genetic Binary Cuckoo Search Feature Selection</p>
           </div>
         </div>
 
@@ -68,7 +66,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           })}
         </nav>
 
-        {/* Right Utility Bar: Dataset Switcher & Backend Status */}
+        {/* Right Utility Bar: Global Dataset Switcher & Backend Status */}
         <div className="flex items-center space-x-3">
           <select
             value={selectedDataset}
@@ -88,7 +86,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             <Radio className={`w-3 h-3 animate-pulse ${apiStatus ? 'text-emerald-400' : 'text-amber-400'}`} />
-            <span>{apiStatus ? 'API Connected' : 'Simulated API'}</span>
+            <span>{apiStatus ? 'API Connected' : 'Simulated Fallback'}</span>
           </div>
         </div>
       </div>
