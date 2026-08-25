@@ -1,0 +1,4 @@
+[AutoRun]
+open=START_APPLICATION.bat
+icon=frontend\public\favicon.ico
+label=PhytoCuckoo Thesis Project

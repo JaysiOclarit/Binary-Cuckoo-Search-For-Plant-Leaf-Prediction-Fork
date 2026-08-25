@@ -11,8 +11,17 @@ node_modules/
 # Python cache & venv
 __pycache__/
 *.pyc
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
 .venv/
 venv/
+env/
+manim_env/
+.venv_manim/
+media/
+**/media/
 
 # IDE files
 .idea/
@@ -27,20 +36,13 @@ venv/
 .DS_Store
 Thumbs.db
 
-# Virtual Environments
-manim_env/
-.venv_manim/
-venv/
-.venv/
-env/
+# CD & Packaging temporary distributions
+CD_DISTRIBUTION_PACKAGE/
 
-# Manim Rendering Output & Cache
-media/
-**/media/
-
-# Python Cache & Bytecode
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.pytest_cache/
+# Exclude Research Papers, Manuscripts, Figures, & Non-code Documents
+Research Paper/
+docs/
+figures/
+*.pdf
+*.docx
+*.pptx
