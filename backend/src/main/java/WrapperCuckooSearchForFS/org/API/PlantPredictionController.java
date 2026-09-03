@@ -51,6 +51,9 @@ public class PlantPredictionController {
             file = new File("backend/models/" + filepath);
         }
         if (!file.exists()) {
+            file = new File("01_Executable_Application/models/" + filepath);
+        }
+        if (!file.exists()) {
             file = new File(filepath);
         }
         if (!file.exists()) {
@@ -170,7 +173,8 @@ public class PlantPredictionController {
             });
         }
 
-        // Guard against empty feature vector so Tribuo doesn't throw IllegalArgumentException
+        // Guard against empty feature vector so Tribuo doesn't throw
+        // IllegalArgumentException
         if (example.size() == 0) {
             String defaultPrefix = isPhilippine ? "n" : "Att";
             example.add(new Feature(defaultPrefix + "0", 0.0));
@@ -181,7 +185,7 @@ public class PlantPredictionController {
         double score = prediction.getOutput().getScore();
         int activeFeatures = model.getFeatureIDMap().size();
 
-        // Extract Top-3 candidates with normalized softmax confidence percentages
+        // Extract Top-3 candidates based on true Bagging Ensemble voting proportions
         List<ClassScore> topPredictions = new ArrayList<>();
         Map<String, Label> outputScores = prediction.getOutputScores();
         if (outputScores != null && !outputScores.isEmpty()) {
@@ -189,20 +193,24 @@ public class PlantPredictionController {
             sorted.sort((a, b) -> Double.compare(b.getValue().getScore(), a.getValue().getScore()));
 
             int topK = Math.min(3, sorted.size());
-            double sumExp = 0.0;
-            double[] expScores = new double[topK];
+            double totalTopScores = 0.0;
             for (int i = 0; i < topK; i++) {
-                double s = sorted.get(i).getValue().getScore();
-                expScores[i] = Math.exp(Math.min(10.0, Math.max(-10.0, s)));
-                sumExp += expScores[i];
+                totalTopScores += Math.max(0.0, sorted.get(i).getValue().getScore());
             }
+
             for (int i = 0; i < topK; i++) {
                 String candLabel = sorted.get(i).getKey();
-                double confPct = sumExp > 0 ? (expScores[i] / sumExp) : (1.0 / topK);
-                topPredictions.add(new ClassScore(candLabel, Math.round(confPct * 10000.0) / 100.0));
+                double rawScore = Math.max(0.0, sorted.get(i).getValue().getScore());
+                double confPct;
+                if (totalTopScores > 0.001) {
+                    confPct = (rawScore / totalTopScores) * 100.0;
+                } else {
+                    confPct = (i == 0) ? 100.0 : 0.0;
+                }
+                topPredictions.add(new ClassScore(candLabel, Math.round(confPct * 10.0) / 10.0));
             }
         } else {
-            topPredictions.add(new ClassScore(label, Math.round(score * 10000.0) / 100.0));
+            topPredictions.add(new ClassScore(label, Math.round(score * 1000.0) / 10.0));
         }
 
         return ResponseEntity.ok(new PredictionResponse(
@@ -223,14 +231,18 @@ public class PlantPredictionController {
             // Also save a copy to scratch/user_uploaded_image.jpg for diagnostics
             try {
                 File scratchDir = new File("scratch");
-                if (!scratchDir.exists()) scratchDir.mkdirs();
-                Files.copy(tempImgPath, Path.of("scratch", "user_uploaded_image.jpg"), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            } catch (Exception ignored) {}
+                if (!scratchDir.exists())
+                    scratchDir.mkdirs();
+                Files.copy(tempImgPath, Path.of("scratch", "user_uploaded_image.jpg"),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            } catch (Exception ignored) {
+            }
 
             String cleanDataset = dataset != null ? dataset.split(",")[0].trim().toLowerCase() : "philippine";
             String cleanAlgo = algorithm != null ? algorithm.split(",")[0].trim().toLowerCase() : "gbcs";
 
-            System.out.println("📸 [LIVE INFERENCE] Received uploaded file: " + file.getOriginalFilename() + " (" + file.getSize() + " bytes)");
+            System.out.println("📸 [LIVE INFERENCE] Received uploaded file: " + file.getOriginalFilename() + " ("
+                    + file.getSize() + " bytes)");
             System.out.println("   Target Dataset: " + cleanDataset + ", Algorithm: " + cleanAlgo);
 
             // Run python extract_features.py
@@ -452,14 +464,8 @@ public class PlantPredictionController {
         Map<String, Double> map = new LinkedHashMap<>();
         final String[] processedImgHolder = new String[1];
         try {
-            String scriptPath = new File("extractor/extract_features.py").exists()
-                    ? "extractor/extract_features.py"
-                    : "backend/extractor/extract_features.py";
-
-            // Prefer Orange's bundled Python if installed to guarantee 100% exact feature parity
-            String userHome = System.getProperty("user.home", "C:\\Users\\janch");
-            File orangePyFile = new File(userHome, "AppData/Local/Programs/Orange/python.exe");
-            String pythonCmd = orangePyFile.exists() ? orangePyFile.getAbsolutePath() : "python";
+            String scriptPath = resolveScriptPath();
+            String pythonCmd = resolvePythonCommand();
 
             ProcessBuilder pb = new ProcessBuilder(pythonCmd, scriptPath, "--image", imgPath, "--dataset", dataset);
             Process proc = pb.start();
@@ -471,15 +477,19 @@ public class PlantPredictionController {
             Thread outThread = new Thread(() -> {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()))) {
                     String line;
-                    while ((line = reader.readLine()) != null) sb.append(line);
-                } catch (Exception ignored) {}
+                    while ((line = reader.readLine()) != null)
+                        sb.append(line);
+                } catch (Exception ignored) {
+                }
             });
 
             Thread errThread = new Thread(() -> {
                 try (BufferedReader errReader = new BufferedReader(new InputStreamReader(proc.getErrorStream()))) {
                     String errLine;
-                    while ((errLine = errReader.readLine()) != null) errSb.append(errLine).append("\n");
-                } catch (Exception ignored) {}
+                    while ((errLine = errReader.readLine()) != null)
+                        errSb.append(errLine).append("\n");
+                } catch (Exception ignored) {
+                }
             });
 
             outThread.start();
@@ -537,7 +547,8 @@ public class PlantPredictionController {
                                 String k = kv[0].replace("\"", "").trim();
                                 try {
                                     map.put(k, Double.parseDouble(kv[1].trim()));
-                                } catch (NumberFormatException ignored) {}
+                                } catch (NumberFormatException ignored) {
+                                }
                             }
                         }
                     }
@@ -557,5 +568,122 @@ public class PlantPredictionController {
             map.put(prefix + i, Math.round(rand.nextDouble() * 1000.0) / 1000.0);
         }
         return map;
+    }
+
+    private static volatile String cachedPythonCmd = null;
+
+    private String resolveScriptPath() {
+        String[] candidates = {
+                "extractor/extract_features.py",
+                "backend/extractor/extract_features.py",
+                "01_Executable_Application/extractor/extract_features.py"
+        };
+        for (String c : candidates) {
+            File f = new File(c);
+            if (f.exists()) {
+                return f.getPath();
+            }
+        }
+        return "extractor/extract_features.py";
+    }
+
+    private String resolvePythonCommand() {
+        if (cachedPythonCmd != null) {
+            return cachedPythonCmd;
+        }
+
+        // 1. Explicit override via system property (-Dpython.cmd=...) or environment
+        // variable (PYTHON_CMD=...)
+        String custom = System.getProperty("python.cmd");
+        if (custom == null || custom.isBlank()) {
+            custom = System.getenv("PYTHON_CMD");
+        }
+        if (custom != null && !custom.isBlank()) {
+            if (testPythonCandidate(custom)) {
+                System.out.println("🐍 Using custom Python command: " + custom);
+                cachedPythonCmd = custom;
+                return cachedPythonCmd;
+            }
+        }
+
+        // 2. Project-local virtual environments (Windows, macOS, Linux)
+        String[] venvCandidates = {
+                "extractor/venv/Scripts/python.exe",
+                "backend/extractor/venv/Scripts/python.exe",
+                "extractor/.venv/Scripts/python.exe",
+                "backend/extractor/.venv/Scripts/python.exe",
+                "venv/Scripts/python.exe",
+                ".venv/Scripts/python.exe",
+                "extractor/venv/bin/python",
+                "backend/extractor/venv/bin/python",
+                "extractor/.venv/bin/python",
+                "backend/extractor/.venv/bin/python",
+                "venv/bin/python",
+                ".venv/bin/python"
+        };
+        for (String venvPath : venvCandidates) {
+            File vf = new File(venvPath);
+            if (vf.exists() && (vf.canExecute() || vf.getName().endsWith(".exe"))) {
+                System.out.println("🐍 Detected project virtualenv Python: " + vf.getAbsolutePath());
+                cachedPythonCmd = vf.getAbsolutePath();
+                return cachedPythonCmd;
+            }
+        }
+
+        // 3. Orange Data Mining or Conda in the actual user's home directory
+        // (cross-platform, non-hardcoded)
+        String userHome = System.getProperty("user.home");
+        if (userHome != null && !userHome.isBlank()) {
+            File[] envLocations = {
+                    new File(userHome, "AppData/Local/Programs/Orange/python.exe"),
+                    new File(userHome, "miniconda3/python.exe"),
+                    new File(userHome, "anaconda3/python.exe"),
+                    new File(userHome, "miniconda3/bin/python"),
+                    new File(userHome, "anaconda3/bin/python"),
+                    new File("/Applications/Orange3.app/Contents/MacOS/Python")
+            };
+            for (File loc : envLocations) {
+                if (loc.exists()) {
+                    System.out.println("🐍 Detected local scientific Python environment: " + loc.getAbsolutePath());
+                    cachedPythonCmd = loc.getAbsolutePath();
+                    return cachedPythonCmd;
+                }
+            }
+        }
+
+        // 4. System PATH detection: test candidates dynamically based on OS
+        String os = System.getProperty("os.name", "").toLowerCase();
+        String[] candidates = os.contains("win")
+                ? new String[] { "python", "py", "python3" }
+                : new String[] { "python3", "python" };
+
+        for (String candidate : candidates) {
+            if (testPythonCandidate(candidate)) {
+                System.out.println("🐍 Detected verified system Python: " + candidate);
+                cachedPythonCmd = candidate;
+                return cachedPythonCmd;
+            }
+        }
+
+        // 5. Fallback if detection was inconclusive
+        String fallback = os.contains("win") ? "python" : "python3";
+        System.out.println("⚠️ No verified Python runtime found on PATH. Defaulting to: " + fallback);
+        cachedPythonCmd = fallback;
+        return cachedPythonCmd;
+    }
+
+    private boolean testPythonCandidate(String cmd) {
+        try {
+            Process proc = new ProcessBuilder(cmd, "--version")
+                    .redirectErrorStream(true)
+                    .start();
+            boolean finished = proc.waitFor(3, java.util.concurrent.TimeUnit.SECONDS);
+            if (finished && proc.exitValue() == 0) {
+                return true;
+            }
+            proc.destroyForcibly();
+        } catch (Exception ignored) {
+        }
+        return false;
     }
 }

@@ -10,14 +10,44 @@ from PIL import Image
 
 warnings.filterwarnings('ignore')
 
+def apply_clahe_shadow_suppression(rgb_img_uint8: np.ndarray, mask: np.ndarray = None, clip_limit: float = 2.0) -> np.ndarray:
+    """
+    Applies Contrast Limited Adaptive Histogram Equalization (CLAHE) to the L* (luminance)
+    channel in CIELAB color space. This equalizes harsh outdoor shadows, non-uniform solar
+    illumination gradients, and specular glare across foliar surfaces without altering
+    chromatic foliar hue or chlorophyll saturation.
+    Safe for both lab and field images: on uniform lab images, clip_limit prevents over-amplification.
+    """
+    try:
+        import cv2
+        lab = cv2.cvtColor(rgb_img_uint8, cv2.COLOR_RGB2LAB)
+        l_channel, a_channel, b_channel = cv2.split(lab)
+
+        clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(8, 8))
+        l_clahe = clahe.apply(l_channel)
+
+        if mask is not None:
+            # Apply equalized luminance specifically to the segmented foliar blade
+            l_final = np.where(mask, l_clahe, l_channel)
+        else:
+            l_final = l_clahe
+
+        lab_equalized = cv2.merge((l_final, a_channel, b_channel))
+        return cv2.cvtColor(lab_equalized, cv2.COLOR_LAB2RGB)
+    except Exception:
+        # Graceful fallback: return unmodified array if cv2 is not available
+        return rgb_img_uint8
+
 def auto_mask_and_letterbox(raw_img: Image.Image, target_size=(299, 299)) -> tuple[Image.Image, str]:
     """
     1. Segments subject leaf from background (table, hands, shadows, outdoor clutter)
        and fills background with pure white (255, 255, 255) to align with Swedish/Flavia/Philippine
        laboratory benchmark distributions.
-    2. Letterboxes leaf onto target_size canvas while strictly preserving aspect ratio
+    2. Applies Gray-World color constancy + CIELAB CLAHE shadow suppression to neutralize
+       ambient color casts and harsh directional lighting/shadows.
+    3. Letterboxes leaf onto target_size canvas while strictly preserving aspect ratio
        to prevent venation angle and morphological perimeter distortion.
-    3. Returns (processed_PIL_image, base64_data_uri).
+    4. Returns (processed_PIL_image, base64_data_uri).
     """
     img = raw_img.convert("RGB")
     arr = np.array(img, dtype=np.float32)
@@ -74,7 +104,29 @@ def auto_mask_and_letterbox(raw_img: Image.Image, target_size=(299, 299)) -> tup
     # If valid foreground detected
     if 0.01 <= foreground_ratio <= 0.98:
         masked_arr = arr.copy()
-        # Set all background pixels (towel, fingers, desk, shadows) to pure studio white
+
+        # Apply Gray-World Color Constancy to the foliar blade to neutralize ambient lighting casts
+        mean_r = np.mean(r[leaf_mask])
+        mean_g = np.mean(g[leaf_mask])
+        mean_b = np.mean(b[leaf_mask])
+        gray_target = (mean_r + mean_g + mean_b) / 3.0
+
+        gain_r = float(np.clip(gray_target / max(mean_r, 1e-5), 0.75, 1.35))
+        gain_g = float(np.clip(gray_target / max(mean_g, 1e-5), 0.75, 1.35))
+        gain_b = float(np.clip(gray_target / max(mean_b, 1e-5), 0.75, 1.35))
+
+        masked_arr[:, :, 0][leaf_mask] = np.clip(masked_arr[:, :, 0][leaf_mask] * gain_r, 0, 255)
+        masked_arr[:, :, 1][leaf_mask] = np.clip(masked_arr[:, :, 1][leaf_mask] * gain_g, 0, 255)
+        masked_arr[:, :, 2][leaf_mask] = np.clip(masked_arr[:, :, 2][leaf_mask] * gain_b, 0, 255)
+
+        # CIELAB CLAHE Shadow & Glare Suppression:
+        # Equalizes non-uniform solar illumination and cast shadows on the leaf blade
+        # while keeping chromatic channels (chlorophyll green/yellow) intact.
+        leaf_uint8 = np.clip(masked_arr, 0, 255).astype(np.uint8)
+        clahe_enhanced = apply_clahe_shadow_suppression(leaf_uint8, mask=leaf_mask, clip_limit=2.0)
+        masked_arr[leaf_mask] = clahe_enhanced[leaf_mask].astype(np.float32)
+
+        # Set all background pixels (towel, fingers, desk, outdoor clutter) to pure studio white
         masked_arr[~leaf_mask] = 255.0
 
         # Crop to bounding box with 5% morphological cushion
@@ -92,7 +144,9 @@ def auto_mask_and_letterbox(raw_img: Image.Image, target_size=(299, 299)) -> tup
 
         leaf_cropped = Image.fromarray(masked_arr[ymin:ymax, xmin:xmax].astype(np.uint8))
     else:
-        leaf_cropped = img
+        # Fallback when no background is cleanly segregated (e.g., extreme macro crop)
+        leaf_uint8 = np.clip(arr, 0, 255).astype(np.uint8)
+        leaf_cropped = Image.fromarray(apply_clahe_shadow_suppression(leaf_uint8, clip_limit=1.5))
 
     # 2. Aspect-Ratio Preserving Letterbox onto White Canvas
     img_w, img_h = leaf_cropped.size
@@ -180,8 +234,16 @@ def extract_inception_v3_features(image_path: str, feature_count: int = 2048, da
         if not extracted_vector or len(extracted_vector) < feature_count:
             raise ValueError(f"Inception-V3 returned incomplete vector: {len(extracted_vector) if extracted_vector else 0} features")
 
+        # L2 Energy Calibration: Standardize vector magnitude to match training benchmark mean norm (~20.28)
+        vec_arr = np.array(extracted_vector[:feature_count], dtype=np.float32)
+        v_norm = float(np.linalg.norm(vec_arr))
+        if v_norm > 1e-5:
+            calibrated_vec = vec_arr * (20.28 / v_norm)
+        else:
+            calibrated_vec = vec_arr
+
         features = {}
-        for i, val in enumerate(extracted_vector[:feature_count]):
+        for i, val in enumerate(calibrated_vec):
             features[f"{prefix}{i}"] = round(float(val), 6)
 
         return {
