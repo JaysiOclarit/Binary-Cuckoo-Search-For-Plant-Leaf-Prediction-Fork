@@ -6,8 +6,6 @@ import org.tribuo.Feature;
 import org.tribuo.ImmutableFeatureMap;
 import org.tribuo.classification.Label;
 
-import java.util.List;
-
 /**
  * Utility for evaluating comparative metrics between Baseline BCS and Proposed GBCS models.
  * <p>

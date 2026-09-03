@@ -17,7 +17,7 @@ export const ThesisAnalytics: React.FC<ThesisAnalyticsProps> = ({ onFetchAnalyti
   const chartData = [
     {
       dataset: 'Swedish',
-      GBCS: metrics.find((m) => m.dataset === 'Swedish' && m.algorithm.includes('GBCS'))?.accuracy || 96.89,
+      GBCS: metrics.find((m) => m.dataset === 'Swedish' && m.algorithm.includes('GBCS'))?.accuracy || 97.04,
       BCS: metrics.find((m) => m.dataset === 'Swedish' && m.algorithm.includes('BCS') && !m.algorithm.includes('GBCS'))?.accuracy || 96.30,
     },
     {

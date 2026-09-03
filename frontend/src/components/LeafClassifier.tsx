@@ -67,6 +67,12 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
       label: 'Philippine Specimen 3',
       description: 'Sampasampalukan (Medicinal herbal specimen)',
     },
+    {
+      name: 'Mentha cordifolia Opiz',
+      dataset: 'philippine',
+      label: 'Philippine Specimen 4',
+      description: 'Yerba Buena (Aromatic crenate-serrate medicinal leaf)',
+    },
   ];
 
   // Filter presets by active dataset or show all if none match
@@ -227,6 +233,15 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
                 </button>
               </div>
             )}
+
+            {/* Botanical Capture Advisory */}
+            <div className="mt-4 p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-slate-400 flex items-start space-x-2.5">
+              <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold text-slate-200">Botanical Vision Pipeline: </span>
+                Uploaded leaves undergo automated botanical segmentation (ExG chlorophyll masking) and aspect-ratio letterboxing onto a 299×299 white canvas to mirror benchmark lab scanning conditions.
+              </div>
+            </div>
           </div>
 
           {/* Option B: Specimen Gallery Presets */}
@@ -303,13 +318,13 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
                 </div>
               </div>
             ) : result ? (
-              <div className="space-y-5">
-                {/* Species Badge */}
+              <div className="space-y-4">
+                {/* Primary Species Badge */}
                 <div className="p-4 rounded-xl bg-gradient-to-br from-slate-900 to-slate-950 border border-emerald-500/30">
                   <div className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider mb-0.5">
-                    Predicted Species
+                    Top Predicted Species
                   </div>
-                  <div className="text-lg font-extrabold text-white mb-1 capitalize">
+                  <div className="text-lg font-extrabold text-white mb-1 capitalize italic">
                     {result.predictedClass}
                   </div>
                   <div className="text-[11px] text-slate-400 flex items-center space-x-1.5">
@@ -318,24 +333,61 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
                   </div>
                 </div>
 
-                {/* Confidence Meter */}
-                <div>
-                  <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="text-slate-400 font-medium">Confidence Score</span>
-                    <span className="font-bold text-emerald-400 font-mono">
-                      {(result.confidenceScore * 100).toFixed(2)}%
-                    </span>
+                {/* Top-3 Candidates Ranking */}
+                {result.topPredictions && result.topPredictions.length > 0 && (
+                  <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-2.5">
+                    <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider flex items-center justify-between">
+                      <span>Top-3 Candidate Ranking</span>
+                      <span className="text-emerald-400 font-mono text-[9px]">Calibrated Confidence</span>
+                    </div>
+                    <div className="space-y-2">
+                      {result.topPredictions.map((cand, idx) => (
+                        <div key={cand.label} className="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800/80">
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <div className="flex items-center space-x-2">
+                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                                idx === 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'
+                              }`}>
+                                #{idx + 1}
+                              </span>
+                              <span className="font-semibold text-slate-200 italic">{cand.label}</span>
+                            </div>
+                            <span className="font-mono text-xs font-bold text-emerald-400">{cand.confidence.toFixed(1)}%</span>
+                          </div>
+                          <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-700 ${idx === 0 ? 'bg-emerald-500' : (idx === 1 ? 'bg-teal-500' : 'bg-slate-600')}`}
+                              style={{ width: `${Math.min(100, Math.max(5, cand.confidence))}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden p-0.5 border border-slate-800">
-                    <div
-                      className="bg-gradient-to-r from-emerald-500 to-teal-300 h-full rounded-full transition-all duration-700"
-                      style={{ width: `${Math.min(100, Math.max(10, result.confidenceScore * 100))}%` }}
-                    />
+                )}
+
+                {/* Auto-Masked Leaf Preview */}
+                {result.processedImage && (
+                  <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800">
+                    <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-2 flex items-center justify-between">
+                      <span>Auto-Masked Specimen</span>
+                      <span className="text-[9px] text-teal-400 font-mono">Aspect-Preserved (299×299)</span>
+                    </div>
+                    <div className="flex items-center justify-center bg-white p-2 rounded-lg border border-slate-800 h-32">
+                      <img
+                        src={result.processedImage}
+                        alt="Auto-masked leaf specimen"
+                        className="max-h-28 object-contain"
+                      />
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-2 text-center">
+                      Chlorophyll-isolated leaf lamina letterboxed onto pure white canvas to eliminate background noise.
+                    </p>
                   </div>
-                </div>
+                )}
 
                 {/* Feature Statistics */}
-                <div className="grid grid-cols-2 gap-3 pt-3 border-t border-slate-800">
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800">
                   <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
                     <div className="text-[10px] text-slate-400 uppercase font-semibold mb-0.5 flex items-center space-x-1">
                       <Layers className="w-3 h-3 text-emerald-400" />

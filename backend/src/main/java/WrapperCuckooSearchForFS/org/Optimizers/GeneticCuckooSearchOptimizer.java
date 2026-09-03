@@ -17,11 +17,9 @@ import org.tribuo.provenance.FeatureSelectorProvenance;
 import org.tribuo.provenance.impl.FeatureSelectorProvenanceImpl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.SplittableRandom;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Proposed Genetic Binary Cuckoo Search (GBCS) Algorithm for Feature Selection.

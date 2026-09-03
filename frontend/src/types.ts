@@ -1,9 +1,16 @@
+export interface ClassScore {
+  label: string;
+  confidence: number;
+}
+
 export interface PredictionResult {
   predictedClass: string;
   confidenceScore: number;
   dataset: string;
   algorithm: string;
   featureCount: number;
+  topPredictions?: ClassScore[];
+  processedImage?: string;
 }
 
 export interface SubspaceProfilePoint {

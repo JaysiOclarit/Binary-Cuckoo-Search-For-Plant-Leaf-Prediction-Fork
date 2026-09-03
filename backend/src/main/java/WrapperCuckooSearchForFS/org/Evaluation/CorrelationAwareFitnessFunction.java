@@ -16,9 +16,7 @@ import org.tribuo.evaluation.CrossValidation;
 import org.tribuo.provenance.FeatureSetProvenance;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Proposed Correlation-Aware Fitness Function for Genetic Binary Cuckoo Search (GBCS).

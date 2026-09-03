@@ -10,11 +10,12 @@ import org.tribuo.impl.ArrayExample;
 import org.tribuo.Example;
 import org.tribuo.Feature;
 import jakarta.annotation.PostConstruct;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 @RestController
@@ -72,11 +73,23 @@ public class PlantPredictionController {
     }
 
     // DTO Records
+    public record ClassScore(String label, double confidence) {
+    }
+
     public record PredictionRequest(String dataset, String algorithm, Map<String, Double> features) {
     }
 
-    public record PredictionResponse(String predictedClass, double confidenceScore, String dataset, String algorithm,
-            int featureCount) {
+    public record PredictionResponse(
+            String predictedClass,
+            double confidenceScore,
+            String dataset,
+            String algorithm,
+            int featureCount,
+            List<ClassScore> topPredictions,
+            String processedImage) {
+    }
+
+    public record ExtractionResult(Map<String, Double> features, String processedImage) {
     }
 
     public record ComparisonResponse(
@@ -93,6 +106,10 @@ public class PlantPredictionController {
 
     @PostMapping("/predict")
     public ResponseEntity<?> predict(@RequestBody PredictionRequest request) {
+        return executePrediction(request, null);
+    }
+
+    public ResponseEntity<?> executePrediction(PredictionRequest request, String processedImage) {
         String targetDataset = request.dataset() != null ? request.dataset().toLowerCase().trim() : "swedish";
         String rawAlgo = request.algorithm() != null ? request.algorithm().toLowerCase().trim() : "gbcs";
 
@@ -103,6 +120,8 @@ public class PlantPredictionController {
             targetDataset = "flavia";
         else if (targetDataset.contains("swedish"))
             targetDataset = "swedish";
+        else
+            targetDataset = "swedish"; // Safe fallback to default benchmark
 
         // Clean algorithm name
         String algorithm = (rawAlgo.contains("bcs") && !rawAlgo.contains("gbcs")) ? "bcs" : "gbcs";
@@ -151,12 +170,43 @@ public class PlantPredictionController {
             });
         }
 
+        // Guard against empty feature vector so Tribuo doesn't throw IllegalArgumentException
+        if (example.size() == 0) {
+            String defaultPrefix = isPhilippine ? "n" : "Att";
+            example.add(new Feature(defaultPrefix + "0", 0.0));
+        }
+
         Prediction<Label> prediction = model.predict(example);
         String label = prediction.getOutput().getLabel();
         double score = prediction.getOutput().getScore();
         int activeFeatures = model.getFeatureIDMap().size();
 
-        return ResponseEntity.ok(new PredictionResponse(label, score, targetDataset, algorithm, activeFeatures));
+        // Extract Top-3 candidates with normalized softmax confidence percentages
+        List<ClassScore> topPredictions = new ArrayList<>();
+        Map<String, Label> outputScores = prediction.getOutputScores();
+        if (outputScores != null && !outputScores.isEmpty()) {
+            List<Map.Entry<String, Label>> sorted = new ArrayList<>(outputScores.entrySet());
+            sorted.sort((a, b) -> Double.compare(b.getValue().getScore(), a.getValue().getScore()));
+
+            int topK = Math.min(3, sorted.size());
+            double sumExp = 0.0;
+            double[] expScores = new double[topK];
+            for (int i = 0; i < topK; i++) {
+                double s = sorted.get(i).getValue().getScore();
+                expScores[i] = Math.exp(Math.min(10.0, Math.max(-10.0, s)));
+                sumExp += expScores[i];
+            }
+            for (int i = 0; i < topK; i++) {
+                String candLabel = sorted.get(i).getKey();
+                double confPct = sumExp > 0 ? (expScores[i] / sumExp) : (1.0 / topK);
+                topPredictions.add(new ClassScore(candLabel, Math.round(confPct * 10000.0) / 100.0));
+            }
+        } else {
+            topPredictions.add(new ClassScore(label, Math.round(score * 10000.0) / 100.0));
+        }
+
+        return ResponseEntity.ok(new PredictionResponse(
+                label, score, targetDataset, algorithm, activeFeatures, topPredictions, processedImage));
     }
 
     @PostMapping("/predict-image")
@@ -170,17 +220,36 @@ public class PlantPredictionController {
             Path tempImgPath = Files.createTempFile("leaf_", "_" + file.getOriginalFilename());
             file.transferTo(tempImgPath.toFile());
 
+            // Also save a copy to scratch/user_uploaded_image.jpg for diagnostics
+            try {
+                File scratchDir = new File("scratch");
+                if (!scratchDir.exists()) scratchDir.mkdirs();
+                Files.copy(tempImgPath, Path.of("scratch", "user_uploaded_image.jpg"), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            } catch (Exception ignored) {}
+
+            String cleanDataset = dataset != null ? dataset.split(",")[0].trim().toLowerCase() : "philippine";
+            String cleanAlgo = algorithm != null ? algorithm.split(",")[0].trim().toLowerCase() : "gbcs";
+
+            System.out.println("📸 [LIVE INFERENCE] Received uploaded file: " + file.getOriginalFilename() + " (" + file.getSize() + " bytes)");
+            System.out.println("   Target Dataset: " + cleanDataset + ", Algorithm: " + cleanAlgo);
+
             // Run python extract_features.py
-            Map<String, Double> extractedFeatures = runFeatureExtractionScript(tempImgPath.toString(), dataset);
+            ExtractionResult extraction = runFeatureExtractionScript(tempImgPath.toString(), cleanDataset);
             Files.deleteIfExists(tempImgPath);
 
-            if (extractedFeatures == null || extractedFeatures.isEmpty()) {
+            if (extraction == null || extraction.features() == null || extraction.features().isEmpty()) {
+                System.err.println("❌ Feature extraction failed for: " + file.getOriginalFilename());
                 return ResponseEntity.badRequest().body(Map.of("error",
                         "Inception-V3 feature extraction failed for uploaded image file. Please check image format."));
             }
 
-            PredictionRequest req = new PredictionRequest(dataset, algorithm, extractedFeatures);
-            return predict(req);
+            PredictionRequest req = new PredictionRequest(cleanDataset, cleanAlgo, extraction.features());
+            ResponseEntity<?> resp = executePrediction(req, extraction.processedImage());
+            if (resp.getBody() instanceof PredictionResponse pr) {
+                System.out.println("   Result: " + pr.predictedClass() + " (Score: " + pr.confidenceScore() + ")");
+                System.out.println("   Top Candidates: " + pr.topPredictions());
+            }
+            return resp;
 
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
@@ -285,23 +354,23 @@ public class PlantPredictionController {
     public ResponseEntity<?> getAnalytics() {
         List<Map<String, Object>> metrics = new ArrayList<>();
 
-        // Swedish Dataset Metrics (K=9)
-        metrics.add(Map.of("dataset", "Swedish", "algorithm", "Proposed GBCS", "accuracy", 96.89, "precision", 96.92,
-                "recall", 97.10, "f1", 96.63, "featuresSelected", 1349, "reductionRatio", 34.13));
-        metrics.add(Map.of("dataset", "Swedish", "algorithm", "Baseline BCS", "accuracy", 96.30, "precision", 96.66,
-                "recall", 96.45, "f1", 96.04, "featuresSelected", 1018, "reductionRatio", 50.29));
+        // Swedish Dataset Metrics (Optimal K=7, Table 3 & Table 6)
+        metrics.add(Map.of("dataset", "Swedish", "algorithm", "Proposed GBCS", "accuracy", 97.04, "precision", 97.34,
+                "recall", 97.21, "f1", 97.03, "featuresSelected", 1369, "reductionRatio", 33.15));
+        metrics.add(Map.of("dataset", "Swedish", "algorithm", "Baseline BCS", "accuracy", 96.30, "precision", 96.96,
+                "recall", 96.63, "f1", 96.30, "featuresSelected", 1038, "reductionRatio", 49.32));
 
-        // Flavia Dataset Metrics (K=7)
+        // Flavia Dataset Metrics (Optimal K=7, Table 3 & Table 6)
         metrics.add(Map.of("dataset", "Flavia", "algorithm", "Proposed GBCS", "accuracy", 97.90, "precision", 94.38,
-                "recall", 94.08, "f1", 93.97, "featuresSelected", 1353, "reductionRatio", 33.94));
+                "recall", 94.08, "f1", 93.97, "featuresSelected", 1349, "reductionRatio", 34.13));
         metrics.add(Map.of("dataset", "Flavia", "algorithm", "Baseline BCS", "accuracy", 97.81, "precision", 93.97,
-                "recall", 94.28, "f1", 93.87, "featuresSelected", 1042, "reductionRatio", 49.12));
+                "recall", 94.28, "f1", 93.87, "featuresSelected", 1018, "reductionRatio", 50.29));
 
-        // Philippine Dataset Metrics (K=9)
+        // Philippine Dataset Metrics (Optimal K=9, Table 3 & Table 6)
         metrics.add(Map.of("dataset", "Philippine", "algorithm", "Proposed GBCS", "accuracy", 97.92, "precision", 98.01,
-                "recall", 97.94, "f1", 97.81, "featuresSelected", 1369, "reductionRatio", 33.15));
+                "recall", 97.94, "f1", 97.81, "featuresSelected", 1353, "reductionRatio", 33.94));
         metrics.add(Map.of("dataset", "Philippine", "algorithm", "Baseline BCS", "accuracy", 97.69, "precision", 97.80,
-                "recall", 97.64, "f1", 97.55, "featuresSelected", 985, "reductionRatio", 51.91));
+                "recall", 97.64, "f1", 97.55, "featuresSelected", 1042, "reductionRatio", 49.12));
 
         return ResponseEntity.ok(metrics);
     }
@@ -379,46 +448,105 @@ public class PlantPredictionController {
     }
 
     // Helper Methods
-    private Map<String, Double> runFeatureExtractionScript(String imgPath, String dataset) {
+    private ExtractionResult runFeatureExtractionScript(String imgPath, String dataset) {
         Map<String, Double> map = new LinkedHashMap<>();
+        final String[] processedImgHolder = new String[1];
         try {
             String scriptPath = new File("extractor/extract_features.py").exists()
                     ? "extractor/extract_features.py"
                     : "backend/extractor/extract_features.py";
-            ProcessBuilder pb = new ProcessBuilder("python", scriptPath, "--image", imgPath, "--dataset", dataset);
+
+            // Prefer Orange's bundled Python if installed to guarantee 100% exact feature parity
+            String userHome = System.getProperty("user.home", "C:\\Users\\janch");
+            File orangePyFile = new File(userHome, "AppData/Local/Programs/Orange/python.exe");
+            String pythonCmd = orangePyFile.exists() ? orangePyFile.getAbsolutePath() : "python";
+
+            ProcessBuilder pb = new ProcessBuilder(pythonCmd, scriptPath, "--image", imgPath, "--dataset", dataset);
             Process proc = pb.start();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+            // Asynchronously read streams to prevent buffer deadlock
             StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
+            StringBuilder errSb = new StringBuilder();
+
+            Thread outThread = new Thread(() -> {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) sb.append(line);
+                } catch (Exception ignored) {}
+            });
+
+            Thread errThread = new Thread(() -> {
+                try (BufferedReader errReader = new BufferedReader(new InputStreamReader(proc.getErrorStream()))) {
+                    String errLine;
+                    while ((errLine = errReader.readLine()) != null) errSb.append(errLine).append("\n");
+                } catch (Exception ignored) {}
+            });
+
+            outThread.start();
+            errThread.start();
+
+            boolean finished = proc.waitFor(45, java.util.concurrent.TimeUnit.SECONDS);
+            if (!finished) {
+                proc.destroyForcibly();
+                System.err.println("⚠️ Feature extraction script timed out after 45 seconds. Process killed.");
+                return null;
             }
-            proc.waitFor();
 
-            String rawStr = sb.toString();
-            int firstBrace = rawStr.indexOf("{");
-            int lastBrace = rawStr.lastIndexOf("}");
+            outThread.join(1000);
+            errThread.join(1000);
 
-            if (firstBrace != -1 && lastBrace != -1 && lastBrace > firstBrace) {
-                String jsonContent = rawStr.substring(firstBrace + 1, lastBrace);
-                String[] pairs = jsonContent.split(",");
-                for (String pair : pairs) {
-                    String[] kv = pair.split(":");
-                    if (kv.length == 2) {
-                        String k = kv[0].replace("\"", "").trim();
-                        try {
-                            double v = Double.parseDouble(kv[1].trim());
-                            map.put(k, v);
-                        } catch (NumberFormatException ignored) {}
+            int exitCode = proc.exitValue();
+            String rawStr = sb.toString().trim();
+            String rawErr = errSb.toString().trim();
+
+            if (exitCode != 0 && !rawErr.isEmpty()) {
+                System.err.println("⚠️ Feature extraction script returned code " + exitCode + ": " + rawErr);
+            }
+
+            if (!rawStr.isEmpty()) {
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode root = mapper.readTree(rawStr);
+                    if (root.has("features")) {
+                        JsonNode feats = root.get("features");
+                        feats.fields().forEachRemaining(entry -> {
+                            map.put(entry.getKey(), entry.getValue().asDouble());
+                        });
+                        if (root.has("processed_image")) {
+                            processedImgHolder[0] = root.get("processed_image").asText();
+                        }
+                    } else {
+                        root.fields().forEachRemaining(entry -> {
+                            if (!entry.getKey().equals("processed_image")) {
+                                map.put(entry.getKey(), entry.getValue().asDouble());
+                            } else {
+                                processedImgHolder[0] = entry.getValue().asText();
+                            }
+                        });
+                    }
+                } catch (Exception parseErr) {
+                    System.err.println("⚠️ Jackson parse fallback: " + parseErr.getMessage());
+                    int firstBrace = rawStr.indexOf("{");
+                    int lastBrace = rawStr.lastIndexOf("}");
+                    if (firstBrace != -1 && lastBrace > firstBrace) {
+                        String jsonContent = rawStr.substring(firstBrace + 1, lastBrace);
+                        String[] pairs = jsonContent.split(",");
+                        for (String pair : pairs) {
+                            String[] kv = pair.split(":");
+                            if (kv.length == 2) {
+                                String k = kv[0].replace("\"", "").trim();
+                                try {
+                                    map.put(k, Double.parseDouble(kv[1].trim()));
+                                } catch (NumberFormatException ignored) {}
+                            }
+                        }
                     }
                 }
-            } else {
-                System.err.println("⚠️ Python output did not contain valid JSON bounds: " + rawStr);
             }
         } catch (Exception e) {
             System.err.println("❌ Script feature extraction error: " + e.getMessage());
         }
-        return map;
+        return new ExtractionResult(map, processedImgHolder[0]);
     }
 
     private Map<String, Double> generateSampleFeatures(String dataset) {

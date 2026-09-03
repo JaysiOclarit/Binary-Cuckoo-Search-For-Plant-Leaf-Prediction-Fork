@@ -30,7 +30,7 @@ export const App: React.FC = () => {
 
     let res: Response;
     try {
-      res = await fetch(`/api/predict-image?dataset=${dataset}&algorithm=${algorithm}`, {
+      res = await fetch(`/api/predict-image`, {
         method: 'POST',
         body: formData,
       });
@@ -47,12 +47,21 @@ export const App: React.FC = () => {
   };
 
   const handleClassifyPreset = async (presetName: string, dataset: string, algorithm: string): Promise<PredictionResult> => {
+    const altLabels = dataset === 'swedish'
+      ? ['Ulmus carpinifolia', 'Populus tremula']
+      : (dataset === 'flavia' ? ['Ginkgo biloba', 'Castor aralia'] : ['Vitex negundo', 'Moringa oleifera']);
+
     return {
       predictedClass: presetName,
       confidenceScore: 0.9845,
       dataset,
       algorithm,
-      featureCount: algorithm === 'gbcs' ? (dataset === 'swedish' ? 1349 : (dataset === 'flavia' ? 1353 : 1369)) : (dataset === 'swedish' ? 1018 : (dataset === 'flavia' ? 1042 : 985)),
+      featureCount: algorithm === 'gbcs' ? (dataset === 'swedish' ? 1369 : (dataset === 'flavia' ? 1349 : 1353)) : (dataset === 'swedish' ? 1038 : (dataset === 'flavia' ? 1018 : 1042)),
+      topPredictions: [
+        { label: presetName, confidence: 98.45 },
+        { label: altLabels[0], confidence: 1.15 },
+        { label: altLabels[1], confidence: 0.40 },
+      ],
     };
   };
 
@@ -72,12 +81,12 @@ export const App: React.FC = () => {
       dataset,
       bcsPredictedClass: isPhilippine ? 'Senna alata' : (isFlavia ? 'Acer palmatum' : 'Fagus sylvatica'),
       bcsConfidence: isPhilippine ? 0.9679 : (isFlavia ? 0.9498 : 0.9611),
-      bcsFeatureCount: isPhilippine ? 985 : (isFlavia ? 1042 : 1018),
-      bcsReductionRatio: isPhilippine ? 51.91 : (isFlavia ? 49.12 : 50.29),
+      bcsFeatureCount: isPhilippine ? 1042 : (isFlavia ? 1018 : 1038),
+      bcsReductionRatio: isPhilippine ? 49.12 : (isFlavia ? 50.29 : 49.32),
       gbcsPredictedClass: isPhilippine ? 'Senna alata' : (isFlavia ? 'Acer palmatum' : 'Fagus sylvatica'),
       gbcsConfidence: isPhilippine ? 0.9892 : (isFlavia ? 0.9810 : 0.9845),
-      gbcsFeatureCount: isPhilippine ? 1369 : (isFlavia ? 1353 : 1349),
-      gbcsReductionRatio: isPhilippine ? 33.15 : (isFlavia ? 33.94 : 34.13),
+      gbcsFeatureCount: isPhilippine ? 1353 : (isFlavia ? 1349 : 1369),
+      gbcsReductionRatio: isPhilippine ? 33.94 : (isFlavia ? 34.13 : 33.15),
       winner: 'Proposed GBCS (Higher Accuracy & Superior Feature Representation)',
     };
   };
@@ -91,12 +100,12 @@ export const App: React.FC = () => {
     }
 
     return [
-      { dataset: 'Swedish', algorithm: 'Proposed GBCS', accuracy: 96.89, precision: 96.92, recall: 97.10, f1: 96.63, featuresSelected: 1349, reductionRatio: 34.13 },
-      { dataset: 'Swedish', algorithm: 'Baseline BCS', accuracy: 96.30, precision: 96.66, recall: 96.45, f1: 96.04, featuresSelected: 1018, reductionRatio: 50.29 },
-      { dataset: 'Flavia', algorithm: 'Proposed GBCS', accuracy: 97.90, precision: 94.38, recall: 94.08, f1: 93.97, featuresSelected: 1353, reductionRatio: 33.94 },
-      { dataset: 'Flavia', algorithm: 'Baseline BCS', accuracy: 97.81, precision: 93.97, recall: 94.28, f1: 93.87, featuresSelected: 1042, reductionRatio: 49.12 },
-      { dataset: 'Philippine', algorithm: 'Proposed GBCS', accuracy: 97.92, precision: 98.01, recall: 97.94, f1: 97.81, featuresSelected: 1369, reductionRatio: 33.15 },
-      { dataset: 'Philippine', algorithm: 'Baseline BCS', accuracy: 97.69, precision: 97.80, recall: 97.64, f1: 97.55, featuresSelected: 985, reductionRatio: 51.91 },
+      { dataset: 'Swedish', algorithm: 'Proposed GBCS', accuracy: 97.04, precision: 97.34, recall: 97.21, f1: 97.03, featuresSelected: 1369, reductionRatio: 33.15 },
+      { dataset: 'Swedish', algorithm: 'Baseline BCS', accuracy: 96.30, precision: 96.96, recall: 96.63, f1: 96.30, featuresSelected: 1038, reductionRatio: 49.32 },
+      { dataset: 'Flavia', algorithm: 'Proposed GBCS', accuracy: 97.90, precision: 94.38, recall: 94.08, f1: 93.97, featuresSelected: 1349, reductionRatio: 34.13 },
+      { dataset: 'Flavia', algorithm: 'Baseline BCS', accuracy: 97.81, precision: 93.97, recall: 94.28, f1: 93.87, featuresSelected: 1018, reductionRatio: 50.29 },
+      { dataset: 'Philippine', algorithm: 'Proposed GBCS', accuracy: 97.92, precision: 98.01, recall: 97.94, f1: 97.81, featuresSelected: 1353, reductionRatio: 33.94 },
+      { dataset: 'Philippine', algorithm: 'Baseline BCS', accuracy: 97.69, precision: 97.80, recall: 97.64, f1: 97.55, featuresSelected: 1042, reductionRatio: 49.12 },
     ];
   };
 

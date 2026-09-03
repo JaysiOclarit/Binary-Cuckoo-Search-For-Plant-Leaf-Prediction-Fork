@@ -46,3 +46,8 @@ figures/
 *.pdf
 *.docx
 *.pptx
+
+# Scratch & Temporary Diagnostics
+scratch/
+**/scratch/
+backend/scratch/

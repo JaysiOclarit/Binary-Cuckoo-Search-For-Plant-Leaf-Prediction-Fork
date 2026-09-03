@@ -15,7 +15,6 @@ import org.tribuo.util.Util;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.nio.file.Paths;
 
 /**
  * Trains and saves the final Factorization Machine (FM) + Bagging Ensemble

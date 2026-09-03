@@ -13,7 +13,6 @@ import org.tribuo.math.optimisers.AdaGrad;
 import org.tribuo.util.Util;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 
 public class MainClass_Bagging {
     public static void main(String[] args) throws IOException {
