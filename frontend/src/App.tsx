@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Navbar } from './components/Navbar';
 import { LeafClassifier } from './components/LeafClassifier';
-import { SideBySideBenchmark } from './components/SideBySideBenchmark';
-import { CuckooSimulator } from './components/CuckooSimulator';
-import { ThesisAnalytics } from './components/ThesisAnalytics';
 import { PredictionResult, ComparisonResult, AnalyticsMetric, ConvergencePoint } from './types';
+
+// Lazy-load heavy analytical visualization components to drastically cut initial bundle
+const SideBySideBenchmark = lazy(() => import('./components/SideBySideBenchmark').then(m => ({ default: m.SideBySideBenchmark })));
+const CuckooSimulator = lazy(() => import('./components/CuckooSimulator').then(m => ({ default: m.CuckooSimulator })));
+const ThesisAnalytics = lazy(() => import('./components/ThesisAnalytics').then(m => ({ default: m.ThesisAnalytics })));
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('classifier');
@@ -118,14 +120,14 @@ export const App: React.FC = () => {
     }
 
     const ds = dataset.toLowerCase();
-    const gbcsSwedish = [0.877164, 0.883384, 0.883384, 0.883573, 0.884596, 0.885894, 0.885894, 0.885894, 0.886092, 0.886092, 0.887603, 0.888234, 0.888234, 0.888256, 0.888256, 0.888791, 0.888883, 0.889915, 0.889915, 0.890748, 0.891162];
-    const bcsSwedish = [0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159];
+    const gbcsFlavia = [0.877164, 0.883384, 0.883384, 0.883573, 0.884596, 0.885894, 0.885894, 0.885894, 0.886092, 0.886092, 0.887603, 0.888234, 0.888234, 0.888256, 0.888256, 0.888791, 0.888883, 0.889915, 0.889915, 0.890748, 0.891162];
+    const bcsFlavia = [0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159];
 
-    const gbcsFlavia = [0.870288, 0.878577, 0.878577, 0.878577, 0.880282, 0.880282, 0.880282, 0.880687, 0.881862, 0.883145, 0.883347, 0.883347, 0.883347, 0.883644, 0.884028, 0.884028, 0.885465, 0.885743, 0.885833, 0.885833, 0.886053];
-    const bcsFlavia = [0.949878, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205];
+    const gbcsPhilippine = [0.870288, 0.878577, 0.878577, 0.878577, 0.880282, 0.880282, 0.880282, 0.880687, 0.881862, 0.883145, 0.883347, 0.883347, 0.883347, 0.883644, 0.884028, 0.884028, 0.885465, 0.885743, 0.885833, 0.885833, 0.886053];
+    const bcsPhilippine = [0.949878, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205];
 
-    const gbcsPhilippine = [0.882997, 0.888598, 0.888598, 0.889582, 0.889582, 0.891674, 0.891674, 0.891674, 0.892708, 0.892708, 0.892708, 0.892708, 0.892708, 0.893084, 0.893376, 0.895649, 0.895649, 0.895649, 0.895649, 0.895649, 0.895649];
-    const bcsPhilippine = [0.967935, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376];
+    const gbcsSwedish = [0.882997, 0.888598, 0.888598, 0.889582, 0.889582, 0.891674, 0.891674, 0.891674, 0.892708, 0.892708, 0.892708, 0.892708, 0.892708, 0.893084, 0.893376, 0.895649, 0.895649, 0.895649, 0.895649, 0.895649, 0.895649];
+    const bcsSwedish = [0.967935, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376];
 
     const gbcsArr = ds.includes('flavia') ? gbcsFlavia : (ds.includes('philippine') ? gbcsPhilippine : gbcsSwedish);
     const bcsArr = ds.includes('flavia') ? bcsFlavia : (ds.includes('philippine') ? bcsPhilippine : bcsSwedish);
@@ -157,23 +159,33 @@ export const App: React.FC = () => {
           />
         )}
 
-        {activeTab === 'benchmark' && (
-          <SideBySideBenchmark
-            selectedDataset={selectedDataset}
-            onRunComparison={handleRunComparison}
-          />
-        )}
+        <Suspense
+          fallback={
+            <div className="glass-card rounded-2xl p-16 flex flex-col items-center justify-center text-center">
+              <div className="w-10 h-10 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin mb-4" />
+              <p className="text-sm font-semibold text-slate-300">Loading Optimization Dashboard...</p>
+              <p className="text-xs text-slate-500 mt-1">Fetching chart visualization models & metrics</p>
+            </div>
+          }
+        >
+          {activeTab === 'benchmark' && (
+            <SideBySideBenchmark
+              selectedDataset={selectedDataset}
+              onRunComparison={handleRunComparison}
+            />
+          )}
 
-        {activeTab === 'simulator' && (
-          <CuckooSimulator
-            selectedDataset={selectedDataset}
-            onFetchConvergence={handleFetchConvergence}
-          />
-        )}
+          {activeTab === 'simulator' && (
+            <CuckooSimulator
+              selectedDataset={selectedDataset}
+              onFetchConvergence={handleFetchConvergence}
+            />
+          )}
 
-        {activeTab === 'analytics' && (
-          <ThesisAnalytics onFetchAnalytics={handleFetchAnalytics} />
-        )}
+          {activeTab === 'analytics' && (
+            <ThesisAnalytics onFetchAnalytics={handleFetchAnalytics} />
+          )}
+        </Suspense>
       </main>
 
       <footer className="glass-panel border-t border-slate-800/80 py-4 mt-8 text-center text-xs text-slate-400">

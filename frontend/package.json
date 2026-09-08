@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.0.5",
@@ -18,7 +19,6 @@
     "vite": "^8.2.0"
   },
   "dependencies": {
-    "@types/canvas-confetti": "^1.9.0",
     "canvas-confetti": "^1.9.4",
     "lucide-react": "^1.28.0",
     "react": "^19.2.8",

@@ -86,17 +86,32 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
+      setPreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return URL.createObjectURL(file);
+      });
       setActivePreset(null);
       setResult(null);
       setError(null);
     }
   };
 
+  // Revoke object URL on unmount to prevent browser DOM memory retention
+  React.useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
   const handlePresetSelect = async (preset: typeof presetSpecimens[0]) => {
     setActivePreset(preset.name);
     setSelectedFile(null);
-    setPreviewUrl(null);
+    setPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
     setLoading(true);
     setError(null);
 
@@ -181,6 +196,8 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
                   <img
                     src={previewUrl}
                     alt="Leaf specimen preview"
+                    loading="lazy"
+                    decoding="async"
                     className="max-h-44 rounded-lg object-contain"
                   />
                   <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl">
@@ -233,15 +250,6 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
                 </button>
               </div>
             )}
-
-            {/* Botanical Capture Advisory */}
-            <div className="mt-4 p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-slate-400 flex items-start space-x-2.5">
-              <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-              <div>
-                <span className="font-semibold text-slate-200">Botanical Vision Pipeline: </span>
-                Uploaded leaves undergo automated botanical segmentation (ExG chlorophyll masking) and aspect-ratio letterboxing onto a 299×299 white canvas to mirror benchmark lab scanning conditions.
-              </div>
-            </div>
           </div>
 
           {/* Option B: Specimen Gallery Presets */}
@@ -363,26 +371,6 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
                         </div>
                       ))}
                     </div>
-                  </div>
-                )}
-
-                {/* Auto-Masked Leaf Preview */}
-                {result.processedImage && (
-                  <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800">
-                    <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-2 flex items-center justify-between">
-                      <span>Auto-Masked Specimen</span>
-                      <span className="text-[9px] text-teal-400 font-mono">Aspect-Preserved (299×299)</span>
-                    </div>
-                    <div className="flex items-center justify-center bg-white p-2 rounded-lg border border-slate-800 h-32">
-                      <img
-                        src={result.processedImage}
-                        alt="Auto-masked leaf specimen"
-                        className="max-h-28 object-contain"
-                      />
-                    </div>
-                    <p className="text-[10px] text-slate-400 mt-2 text-center">
-                      Chlorophyll-isolated leaf lamina letterboxed onto pure white canvas to eliminate background noise.
-                    </p>
                   </div>
                 )}
 

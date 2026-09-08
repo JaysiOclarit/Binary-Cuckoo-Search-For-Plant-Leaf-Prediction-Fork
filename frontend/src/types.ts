@@ -10,7 +10,6 @@ export interface PredictionResult {
   algorithm: string;
   featureCount: number;
   topPredictions?: ClassScore[];
-  processedImage?: string;
 }
 
 export interface SubspaceProfilePoint {

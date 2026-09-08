@@ -88,11 +88,7 @@ public class PlantPredictionController {
             String dataset,
             String algorithm,
             int featureCount,
-            List<ClassScore> topPredictions,
-            String processedImage) {
-    }
-
-    public record ExtractionResult(Map<String, Double> features, String processedImage) {
+            List<ClassScore> topPredictions) {
     }
 
     public record ComparisonResponse(
@@ -109,10 +105,10 @@ public class PlantPredictionController {
 
     @PostMapping("/predict")
     public ResponseEntity<?> predict(@RequestBody PredictionRequest request) {
-        return executePrediction(request, null);
+        return executePrediction(request);
     }
 
-    public ResponseEntity<?> executePrediction(PredictionRequest request, String processedImage) {
+    public ResponseEntity<?> executePrediction(PredictionRequest request) {
         String targetDataset = request.dataset() != null ? request.dataset().toLowerCase().trim() : "swedish";
         String rawAlgo = request.algorithm() != null ? request.algorithm().toLowerCase().trim() : "gbcs";
 
@@ -214,7 +210,7 @@ public class PlantPredictionController {
         }
 
         return ResponseEntity.ok(new PredictionResponse(
-                label, score, targetDataset, algorithm, activeFeatures, topPredictions, processedImage));
+                label, score, targetDataset, algorithm, activeFeatures, topPredictions));
     }
 
     @PostMapping("/predict-image")
@@ -246,17 +242,17 @@ public class PlantPredictionController {
             System.out.println("   Target Dataset: " + cleanDataset + ", Algorithm: " + cleanAlgo);
 
             // Run python extract_features.py
-            ExtractionResult extraction = runFeatureExtractionScript(tempImgPath.toString(), cleanDataset);
+            Map<String, Double> features = runFeatureExtractionScript(tempImgPath.toString(), cleanDataset);
             Files.deleteIfExists(tempImgPath);
 
-            if (extraction == null || extraction.features() == null || extraction.features().isEmpty()) {
+            if (features == null || features.isEmpty()) {
                 System.err.println("❌ Feature extraction failed for: " + file.getOriginalFilename());
                 return ResponseEntity.badRequest().body(Map.of("error",
                         "Inception-V3 feature extraction failed for uploaded image file. Please check image format."));
             }
 
-            PredictionRequest req = new PredictionRequest(cleanDataset, cleanAlgo, extraction.features());
-            ResponseEntity<?> resp = executePrediction(req, extraction.processedImage());
+            PredictionRequest req = new PredictionRequest(cleanDataset, cleanAlgo, features);
+            ResponseEntity<?> resp = executePrediction(req);
             if (resp.getBody() instanceof PredictionResponse pr) {
                 System.out.println("   Result: " + pr.predictedClass() + " (Score: " + pr.confidenceScore() + ")");
                 System.out.println("   Top Candidates: " + pr.topPredictions());
@@ -424,24 +420,24 @@ public class PlantPredictionController {
         List<Map<String, Object>> points = new ArrayList<>();
         String ds = dataset.toLowerCase();
 
-        double[] gbcsSwedish = { 0.877164, 0.883384, 0.883384, 0.883573, 0.884596, 0.885894, 0.885894, 0.885894,
+        double[] gbcsFlavia = { 0.877164, 0.883384, 0.883384, 0.883573, 0.884596, 0.885894, 0.885894, 0.885894,
                 0.886092, 0.886092, 0.887603, 0.888234, 0.888234, 0.888256, 0.888256, 0.888791, 0.888883, 0.889915,
                 0.889915, 0.890748, 0.891162 };
-        double[] bcsSwedish = { 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159,
+        double[] bcsFlavia = { 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159,
                 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159, 0.961159,
                 0.961159, 0.961159, 0.961159 };
 
-        double[] gbcsFlavia = { 0.870288, 0.878577, 0.878577, 0.878577, 0.880282, 0.880282, 0.880282, 0.880687,
+        double[] gbcsPhilippine = { 0.870288, 0.878577, 0.878577, 0.878577, 0.880282, 0.880282, 0.880282, 0.880687,
                 0.881862, 0.883145, 0.883347, 0.883347, 0.883347, 0.883644, 0.884028, 0.884028, 0.885465, 0.885743,
                 0.885833, 0.885833, 0.886053 };
-        double[] bcsFlavia = { 0.949878, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205,
+        double[] bcsPhilippine = { 0.949878, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205,
                 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205, 0.951205,
-                0.951205, 0.951205 };
+                0.951205, 0.951205, 0.951205 };
 
-        double[] gbcsPhilippine = { 0.882997, 0.888598, 0.888598, 0.889582, 0.889582, 0.891674, 0.891674, 0.891674,
+        double[] gbcsSwedish = { 0.882997, 0.888598, 0.888598, 0.889582, 0.889582, 0.891674, 0.891674, 0.891674,
                 0.892708, 0.892708, 0.892708, 0.892708, 0.892708, 0.893084, 0.893376, 0.895649, 0.895649, 0.895649,
                 0.895649, 0.895649, 0.895649 };
-        double[] bcsPhilippine = { 0.967935, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376,
+        double[] bcsSwedish = { 0.967935, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376,
                 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376, 0.972376,
                 0.972376, 0.972376, 0.972376 };
 
@@ -460,9 +456,8 @@ public class PlantPredictionController {
     }
 
     // Helper Methods
-    private ExtractionResult runFeatureExtractionScript(String imgPath, String dataset) {
+    private Map<String, Double> runFeatureExtractionScript(String imgPath, String dataset) {
         Map<String, Double> map = new LinkedHashMap<>();
-        final String[] processedImgHolder = new String[1];
         try {
             String scriptPath = resolveScriptPath();
             String pythonCmd = resolvePythonCommand();
@@ -522,16 +517,9 @@ public class PlantPredictionController {
                         feats.fields().forEachRemaining(entry -> {
                             map.put(entry.getKey(), entry.getValue().asDouble());
                         });
-                        if (root.has("processed_image")) {
-                            processedImgHolder[0] = root.get("processed_image").asText();
-                        }
                     } else {
                         root.fields().forEachRemaining(entry -> {
-                            if (!entry.getKey().equals("processed_image")) {
-                                map.put(entry.getKey(), entry.getValue().asDouble());
-                            } else {
-                                processedImgHolder[0] = entry.getValue().asText();
-                            }
+                            map.put(entry.getKey(), entry.getValue().asDouble());
                         });
                     }
                 } catch (Exception parseErr) {
@@ -557,7 +545,7 @@ public class PlantPredictionController {
         } catch (Exception e) {
             System.err.println("❌ Script feature extraction error: " + e.getMessage());
         }
-        return new ExtractionResult(map, processedImgHolder[0]);
+        return map;
     }
 
     private Map<String, Double> generateSampleFeatures(String dataset) {
