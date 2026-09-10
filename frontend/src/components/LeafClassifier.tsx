@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, Leaf, CheckCircle2, AlertCircle, RefreshCw, Cpu, Layers, Sparkles, Image as ImageIcon } from 'lucide-react';
+import * as UTIF from 'utif';
 import { PredictionResult } from '../types';
 
 interface LeafClassifierProps {
@@ -82,14 +83,37 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
 
   const activePresetsToDisplay = filteredPresets.length > 0 ? filteredPresets : presetSpecimens;
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
+      setPreviewUrl(null);
       setActivePreset(null);
       setResult(null);
       setError(null);
+
+      if (/\.tiff?$/i.test(file.name) || file.type === 'image/tiff') {
+        try {
+          const buffer = await file.arrayBuffer();
+          const pages = UTIF.decode(buffer);
+          if (!pages.length) throw new Error('TIFF contains no image pages');
+
+          UTIF.decodeImage(buffer, pages[0]);
+          const rgba = UTIF.toRGBA8(pages[0]);
+          const canvas = document.createElement('canvas');
+          canvas.width = pages[0].width;
+          canvas.height = pages[0].height;
+          const context = canvas.getContext('2d');
+          if (!context) throw new Error('Could not create image preview');
+
+          context.putImageData(new ImageData(new Uint8ClampedArray(rgba), canvas.width, canvas.height), 0, 0);
+          setPreviewUrl(canvas.toDataURL('image/png'));
+        } catch {
+          setError('The TIFF file was selected, but its preview could not be decoded. You can still try classification.');
+        }
+      } else {
+        setPreviewUrl(URL.createObjectURL(file));
+      }
     }
   };
 
@@ -203,7 +227,7 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
 
               <input
                 type="file"
-                accept="image/*"
+                accept="image/*,.tif,.tiff,image/tiff"
                 onChange={handleFileChange}
                 className="hidden"
               />
