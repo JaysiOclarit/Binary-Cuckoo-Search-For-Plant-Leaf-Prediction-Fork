@@ -113,87 +113,171 @@ The metrics below are pulled directly from `Results/All_KFold_CrossValidation_Re
 
 ---
 
-## 🚀 Quick Start & Deployment Guide
+## 💻 System Requirements & Prerequisites
 
-Choose the method that best fits your environment:
+Before running the project, verify that the following tools are installed on your system:
 
-### Method 1: Instant One-Click Launch (Evaluators & Panelists)
-Requires **Java 17+** installed. The launcher starts the unified system and automatically opens the dashboard in your default browser.
+| Software | Version | Purpose | Required? |
+| :--- | :---: | :--- | :---: |
+| **Java JDK** | **17+** (JDK 17, 21, or 27) | Spring Boot backend, Oracle Tribuo ML engine, GBCS optimizer | **Yes** |
+| **Node.js & npm** | **18+** (v20, v22, v24) | Vite + React web interface & interactive dashboard | **Yes** |
+| **Orange Data Mining** | **3.x** | Exact Inception-V3 image embedder used for thesis datasets | **Recommended** |
+| **Python** | **3.10 – 3.12** | Standalone PyTorch extractor (if not using Orange) | Optional |
+| **Apache Maven** | **3.8+** | Java build tool (`backend/mvn.cmd` auto-detects extracted copies) | Optional |
 
-*   **Windows**:
-    Double-click `START_APPLICATION.bat` or run:
-    ```cmd
-    START_APPLICATION.bat
-    ```
-*   **macOS / Linux**:
-    ```bash
-    chmod +x start_application.sh
-    ./start_application.sh
-    ```
-The browser will automatically open to **`http://localhost:8080`**.
+> [!IMPORTANT]
+> **Windows Environment Setup**:
+> 1. **Set `JAVA_HOME`**: Maven requires the `JAVA_HOME` environment variable to point to your JDK root (e.g. `C:\Program Files\Java\jdk-27` or `jdk-17`).
+>    * Quick PowerShell fix:
+>      ```powershell
+>      [Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Java\jdk-27", "User")
+>      ```
+> 2. **Enable Script Execution in PowerShell**: Windows blocks `.ps1` scripts by default (which affects `npm`). Run this once in PowerShell:
+>    ```powershell
+>    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+>    ```
 
 ---
 
-### Method 2: Universal Docker Launch (Zero Prerequisites)
-Runs the entire stack (Java 17 Spring Boot + PyTorch CPU feature extraction + Nginx React SPA) in isolated containers without installing Java, Node.js, or Python on your host machine.
+## 🍊 Orange Data Mining Setup (Thesis Standard Embedder)
+
+All thesis datasets (`Swedish`, `Flavia`, `Philippine`) were engineered using **Orange Data Mining's Image Analytics (Inception-V3) add-on**, producing the 2,048 deep features labeled `Att0` to `Att2047`.
+
+To ensure live uploaded images use the exact same feature extraction pipeline:
+
+1. Download and install **[Orange Data Mining](https://orangedatamining.com/download/)** (default path: `C:\Program Files\Orange`).
+2. Open the Orange desktop app.
+3. In the top menu, go to **Options** -> **Add-ons...**.
+4. Check **Orange3-ImageAnalytics** and click **OK** to install.
+   *(Or via terminal: `& "C:\Program Files\Orange\python.exe" -m pip install Orange3-ImageAnalytics`)*
+
+> [!NOTE]
+> The backend server automatically auto-discovers Orange at `C:\Program Files\Orange\python.exe` or `%LOCALAPPDATA%\Programs\Orange\python.exe`.
+> If Orange is not installed, the system automatically falls back to PyTorch Inception-V3.
+
+---
+
+## 🚀 How to Run the Application
+
+Choose whichever launch method best fits your workflow:
+
+### Option 1: One-Click Windows Launcher (Easiest)
+
+Simply double-click **`START_APPLICATION.bat`** from the project root folder.
+* It checks your Java environment.
+* If a pre-packaged JAR exists, it runs it; otherwise, it automatically starts the Spring Boot backend server.
+* It launches the application and opens your default browser at **`http://localhost:8080`**.
+
+---
+
+### Option 2: Developer Mode (Full Source Setup)
+
+If you are developing or testing both the backend and frontend simultaneously:
+
+#### Step 1: Initialize the Frontend (First time only)
+In your terminal, navigate to the `frontend` folder and install packages:
+```powershell
+cd frontend
+npm install
+```
+
+#### Step 2: Start the Backend Server (Terminal 1)
+```powershell
+cd backend
+.\mvn.cmd spring-boot:run
+```
+*(On macOS/Linux, run `./mvnw spring-boot:run` or `mvn spring-boot:run`)*.
+The backend API and Tribuo ML engine will start on **`http://localhost:8080`**.
+
+#### Step 3: Start the Frontend Web UI (Terminal 2)
+```powershell
+cd frontend
+npm run dev
+```
+Open **`http://localhost:5173`** (or `http://localhost:3000`) to interact with the live defense dashboard.
+
+---
+
+### Option 3: Universal Docker Container (Zero Dependencies)
+
+If you have Docker installed and want to run the application without installing Java, Node, or Python:
 
 ```bash
 docker compose up --build
 ```
-Open **`http://localhost:3000`** in your browser to view the application.
+Once built, open **`http://localhost:3000`** in your browser.
 
 ---
 
-### Method 3: Developer Source Build
+### Option 4: Standalone Python Extractor (Without Orange)
 
-#### Step A: Configure Python Feature Extractor Environment
-Run the automated virtualenv setup script to configure PyTorch and image processing libraries in `backend/extractor/venv/`:
-*   **Windows**:
-    ```cmd
-    setup_extractor_env.bat
-    ```
-*   **macOS / Linux**:
-    ```bash
-    chmod +x setup_extractor_env.sh
-    ./setup_extractor_env.sh
-    ```
-*(Note: The Java backend automatically detects local virtualenvs, system Python, Orange Data Mining, or Anaconda installations across all operating systems).*
+If you prefer using a local Python virtual environment instead of Orange Data Mining:
+* **Windows**: Run `setup_extractor_env.bat`
+* **macOS / Linux**: Run `./setup_extractor_env.sh`
 
-#### Step B: Start Java Spring Boot Backend (Port 8080)
-```bash
-cd backend
-mvn spring-boot:run
-```
-*(On Windows systems without Maven on PATH, run `mvn.cmd spring-boot:run`)*
-
-#### Step C: Start React Frontend Web Application (Port 3000)
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Open **`http://localhost:3000`** in your browser.
+This creates `backend/extractor/venv/` and installs PyTorch CPU and Torchvision automatically.
 
 ---
 
-## 📦 Packaging for Academic Submission (CD/DVD / USB Distribution)
+## 📦 Packaging for Academic Submission (CD/DVD / Flash Drive)
 
-To prepare a standalone submission package with pre-built artifacts, run:
+To generate a standalone academic submission bundle with an executable JAR:
 ```cmd
 stage_cd_package.bat
 ```
 This utility:
-1. Compiles the frontend and embeds static web assets directly inside Spring Boot (`backend/src/main/resources/static/`).
+1. Builds the production frontend bundle (`npm run build`) and copies assets to Spring Boot static resources.
 2. Packages a self-contained executable JAR (`PhytoCuckoo-Application.jar`).
-3. Assembles serialized Tribuo models, datasets, launchers, and documentation into `CD_DISTRIBUTION_PACKAGE/` ready for burning to CD/DVD or copying to a USB flash drive.
+3. Assembles models, datasets, launchers, and research papers into `CD_DISTRIBUTION_PACKAGE/`.
+
+---
+
+## ❓ Troubleshooting & Frequently Asked Questions (FAQ)
+
+### 1. `npm : File ... npm.ps1 cannot be loaded because running scripts is disabled`
+* **Cause**: Windows PowerShell restricts running scripts by default.
+* **Fix**: Run this command once in PowerShell:
+  ```powershell
+  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+  ```
+
+### 2. `'tsc' is not recognized as an internal or external command`
+* **Cause**: Frontend dependencies were not installed before running `npm run build`.
+* **Fix**: Navigate into the frontend directory and install dependencies:
+  ```powershell
+  cd frontend
+  npm install
+  npm run build
+  ```
+
+### 3. `JAVA_HOME environment variable is not set`
+* **Cause**: Maven cannot find your JDK directory.
+* **Fix**: Set your `JAVA_HOME` to your JDK root folder (not the `bin` folder):
+  ```powershell
+  [Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Java\jdk-27", "User")
+  ```
+  *(Replace `jdk-27` with your installed JDK version, e.g. `jdk-17` or `jdk-21`).*
+
+### 4. `'mvn' is not recognized as an internal or external command`
+* **Cause**: Apache Maven is not added to your system PATH.
+* **Fix**: Use the bundled wrapper `.\mvn.cmd` inside the `backend/` directory:
+  ```powershell
+  cd backend
+  .\mvn.cmd spring-boot:run
+  ```
+  The wrapper automatically searches for extracted Maven installations in `Program Files` and `AppData`.
+
+### 5. `Unrecognized token 'Downloading': was expecting ...` on First Image Upload
+* **Cause**: PyTorch or Inception-V3 is downloading its pre-trained weights (`.pth`) for the first time.
+* **Fix**: This is normal and only happens once. The backend's fallback parser automatically catches the output. Subsequent predictions will be instantaneous.
 
 ---
 
 ## 🛠️ Technology Stack
 
-*   **Backend**: Java 17 / 24, Spring Boot 3.2, Oracle Tribuo 4.3.1, Apache Commons Math 3.6, oj! Algorithms
-*   **Feature Extractor**: Python 3.10+, PyTorch CPU / Torchvision (Inception-V3 CNN), OpenCV, NumPy, SciPy, Pillow
-*   **Frontend**: React 19, Vite 8, TypeScript, Tailwind CSS v4, Recharts, Lucide React, Canvas Confetti
-*   **Containerization**: Docker, Docker Compose, Nginx Alpine, Eclipse Temurin 17 JRE
-*   **Operating Systems Supported**: Windows 10/11, macOS (Intel & Apple Silicon), Ubuntu / Debian Linux
+* **Backend**: Java 17 / 27, Spring Boot 3.2, Oracle Tribuo 4.3.1, Apache Commons Math 3.6, oj! Algorithms
+* **Feature Extraction**: Orange Data Mining 3 (Image Analytics) / Inception-V3 CNN, PyTorch CPU, Torchvision, Pillow
+* **Frontend**: React 19, Vite 8, TypeScript, Tailwind CSS v4, Recharts, Lucide React, Canvas Confetti
+* **Containerization**: Docker, Docker Compose, Nginx Alpine, Eclipse Temurin 17 JRE
+* **Supported OS**: Windows 10/11, macOS (Apple Silicon / Intel), Ubuntu / Debian Linux
 

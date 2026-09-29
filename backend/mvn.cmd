@@ -28,7 +28,25 @@ for /f "delims=" %%I in ('where mvn.exe 2^>nul') do (
     )
 )
 
-:: 3. Check for IntelliJ IDEA bundled Maven across versions
+:: 3. Check common Apache Maven extracted locations
+for /f "delims=" %%I in ('dir /b /s "%ProgramFiles%\ApacheMaven\mvn.cmd" 2^>nul') do (
+    "%%I" %*
+    exit /b %ERRORLEVEL%
+)
+for /f "delims=" %%I in ('dir /b /s "%LOCALAPPDATA%\Programs\Maven\mvn.cmd" 2^>nul') do (
+    "%%I" %*
+    exit /b %ERRORLEVEL%
+)
+for /f "delims=" %%I in ('dir /b /s "%ProgramFiles%\Apache\mvn.cmd" 2^>nul') do (
+    "%%I" %*
+    exit /b %ERRORLEVEL%
+)
+for /f "delims=" %%I in ('dir /b /s "C:\maven\mvn.cmd" 2^>nul') do (
+    "%%I" %*
+    exit /b %ERRORLEVEL%
+)
+
+:: 4. Check for IntelliJ IDEA bundled Maven across versions
 for /f "delims=" %%I in ('dir /b /ad "%ProgramFiles%\JetBrains\IntelliJ*" 2^>nul') do (
     if exist "%ProgramFiles%\JetBrains\%%I\plugins\maven\lib\maven3\bin\mvn.cmd" (
         "%ProgramFiles%\JetBrains\%%I\plugins\maven\lib\maven3\bin\mvn.cmd" %*

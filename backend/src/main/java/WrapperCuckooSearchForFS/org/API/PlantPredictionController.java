@@ -594,7 +594,29 @@ public class PlantPredictionController {
             }
         }
 
-        // 2. Project-local virtual environments (Windows, macOS, Linux)
+        // 2. Orange Data Mining (Exact Embedder used in Thesis Data Preparation)
+        String userHome = System.getProperty("user.home");
+        List<File> orangeLocations = new ArrayList<>();
+        orangeLocations.add(new File("C:/Program Files/Orange/python.exe"));
+        orangeLocations.add(new File("C:/Program Files (x86)/Orange/python.exe"));
+        if (userHome != null && !userHome.isBlank()) {
+            orangeLocations.add(new File(userHome, "AppData/Local/Programs/Orange/python.exe"));
+            orangeLocations.add(new File(userHome, "miniconda3/python.exe"));
+            orangeLocations.add(new File(userHome, "anaconda3/python.exe"));
+            orangeLocations.add(new File(userHome, "miniconda3/bin/python"));
+            orangeLocations.add(new File(userHome, "anaconda3/bin/python"));
+        }
+        orangeLocations.add(new File("/Applications/Orange3.app/Contents/MacOS/Python"));
+
+        for (File loc : orangeLocations) {
+            if (loc.exists()) {
+                System.out.println("🍊 Detected Orange Data Mining environment: " + loc.getAbsolutePath());
+                cachedPythonCmd = loc.getAbsolutePath();
+                return cachedPythonCmd;
+            }
+        }
+
+        // 3. Project-local virtual environments (Windows, macOS, Linux fallback)
         String[] venvCandidates = {
                 "extractor/venv/Scripts/python.exe",
                 "backend/extractor/venv/Scripts/python.exe",
@@ -615,27 +637,6 @@ public class PlantPredictionController {
                 System.out.println("🐍 Detected project virtualenv Python: " + vf.getAbsolutePath());
                 cachedPythonCmd = vf.getAbsolutePath();
                 return cachedPythonCmd;
-            }
-        }
-
-        // 3. Orange Data Mining or Conda in the actual user's home directory
-        // (cross-platform, non-hardcoded)
-        String userHome = System.getProperty("user.home");
-        if (userHome != null && !userHome.isBlank()) {
-            File[] envLocations = {
-                    new File(userHome, "AppData/Local/Programs/Orange/python.exe"),
-                    new File(userHome, "miniconda3/python.exe"),
-                    new File(userHome, "anaconda3/python.exe"),
-                    new File(userHome, "miniconda3/bin/python"),
-                    new File(userHome, "anaconda3/bin/python"),
-                    new File("/Applications/Orange3.app/Contents/MacOS/Python")
-            };
-            for (File loc : envLocations) {
-                if (loc.exists()) {
-                    System.out.println("🐍 Detected local scientific Python environment: " + loc.getAbsolutePath());
-                    cachedPythonCmd = loc.getAbsolutePath();
-                    return cachedPythonCmd;
-                }
             }
         }
 

@@ -39,8 +39,18 @@ if exist "%JAR_PATH%" (
     echo Opening PhytoCuckoo Dashboard in default browser...
     start http://localhost:8080
 ) else (
-    echo [WARNING] Executable JAR not found.
-    echo Please verify the contents of 01_Executable_Application or 02_Complete_Source_Code.
+    echo [INFO] Pre-packaged JAR not found. Launching Spring Boot server via Maven...
+    if exist "backend\mvn.cmd" (
+        start "" cmd /k "cd backend && .\mvn.cmd spring-boot:run"
+        echo Waiting for application server to initialize...
+        timeout /t 8 /nobreak >nul
+        echo Opening PhytoCuckoo Dashboard in default browser...
+        start http://localhost:8080
+    ) else (
+        echo [ERROR] Neither executable JAR nor backend\mvn.cmd was found.
+        pause
+        exit /b 1
+    )
 )
 
 echo.
