@@ -7,6 +7,7 @@ interface LeafClassifierProps {
   setSelectedDataset: (ds: string) => void;
   onClassifyImage: (file: File, dataset: string, algorithm: string) => Promise<PredictionResult>;
   onClassifyPreset: (presetName: string, dataset: string, algorithm: string) => Promise<PredictionResult>;
+  onSingleResult: (result: PredictionResult) => void;
 }
 
 export const LeafClassifier: React.FC<LeafClassifierProps> = ({
@@ -14,6 +15,7 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
   setSelectedDataset,
   onClassifyImage,
   onClassifyPreset,
+  onSingleResult,
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -25,61 +27,17 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
 
   // Pre-loaded Leaf Presets for Live Testing across Datasets
   const presetSpecimens = [
-    {
-      name: 'Fagus sylvatica',
-      dataset: 'swedish',
-      label: 'Swedish Specimen 1',
-      description: 'European Beech (Ovate, pinnate venation)',
-    },
-    {
-      name: 'Quercus robur',
-      dataset: 'swedish',
-      label: 'Swedish Specimen 2',
-      description: 'English Oak (Lobed margins, robust blade)',
-    },
-    {
-      name: 'Acer palmatum',
-      dataset: 'flavia',
-      label: 'Flavia Specimen 1',
-      description: 'Japanese Maple (Palmately lobed blade)',
-    },
-    {
-      name: 'Ginkgo biloba',
-      dataset: 'flavia',
-      label: 'Flavia Specimen 2',
-      description: 'Ginkgo (Fan-shaped, dichotomous veins)',
-    },
-    {
-      name: 'Senna alata',
-      dataset: 'philippine',
-      label: 'Philippine Specimen 1',
-      description: 'Akapulko (Pinnate compound medicinal leaf)',
-    },
-    {
-      name: 'Leucaena leucocephala',
-      dataset: 'philippine',
-      label: 'Philippine Specimen 2',
-      description: 'Ipil-ipil (Bipinnately compound leaf)',
-    },
-    {
-      name: 'Phyllanthus niruri',
-      dataset: 'philippine',
-      label: 'Philippine Specimen 3',
-      description: 'Sampasampalukan (Medicinal herbal specimen)',
-    },
-    {
-      name: 'Mentha cordifolia Opiz',
-      dataset: 'philippine',
-      label: 'Philippine Specimen 4',
-      description: 'Yerba Buena (Aromatic crenate-serrate medicinal leaf)',
-    },
+    { name: 'Fagus sylvatica', dataset: 'swedish', label: 'Swedish Specimen 1', description: 'European Beech (Ovate, pinnate venation)' },
+    { name: 'Quercus robur', dataset: 'swedish', label: 'Swedish Specimen 2', description: 'English Oak (Lobed margins, robust blade)' },
+    { name: 'Acer palmatum', dataset: 'flavia', label: 'Flavia Specimen 1', description: 'Japanese Maple (Palmately lobed blade)' },
+    { name: 'Ginkgo biloba', dataset: 'flavia', label: 'Flavia Specimen 2', description: 'Ginkgo (Fan-shaped, dichotomous veins)' },
+    { name: 'Senna alata', dataset: 'philippine', label: 'Philippine Specimen 1', description: 'Akapulko (Pinnate compound medicinal leaf)' },
+    { name: 'Leucaena leucocephala', dataset: 'philippine', label: 'Philippine Specimen 2', description: 'Ipil-ipil (Bipinnately compound leaf)' },
+    { name: 'Phyllanthus niruri', dataset: 'philippine', label: 'Philippine Specimen 3', description: 'Sampasampalukan (Medicinal herbal specimen)' },
+    { name: 'Mentha cordifolia Opiz', dataset: 'philippine', label: 'Philippine Specimen 4', description: 'Yerba Buena (Aromatic crenate-serrate medicinal leaf)' },
   ];
 
-  // Filter presets by active dataset or show all if none match
-  const filteredPresets = presetSpecimens.filter(
-    (p) => p.dataset.toLowerCase() === selectedDataset.toLowerCase()
-  );
-
+  const filteredPresets = presetSpecimens.filter(p => p.dataset.toLowerCase() === selectedDataset.toLowerCase());
   const activePresetsToDisplay = filteredPresets.length > 0 ? filteredPresets : presetSpecimens;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,12 +54,9 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
     }
   };
 
-  // Revoke object URL on unmount to prevent browser DOM memory retention
   React.useEffect(() => {
     return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
 
@@ -118,6 +73,7 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
     try {
       const res = await onClassifyPreset(preset.name, preset.dataset, algorithm);
       setResult(res);
+      onSingleResult(res);
     } catch (err: any) {
       setError(err.message || 'Classification failed');
     } finally {
@@ -133,6 +89,7 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
     try {
       const res = await onClassifyImage(selectedFile, selectedDataset, algorithm);
       setResult(res);
+      onSingleResult(res);
     } catch (err: any) {
       setError(err.message || 'Classification failed');
     } finally {
@@ -193,17 +150,9 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
             <label className="group relative flex flex-col items-center justify-center h-48 border-2 border-dashed border-slate-700/80 hover:border-emerald-500/80 rounded-xl cursor-pointer bg-slate-950/40 hover:bg-slate-950/70 transition-all">
               {previewUrl ? (
                 <div className="relative w-full h-full p-2 flex items-center justify-center">
-                  <img
-                    src={previewUrl}
-                    alt="Leaf specimen preview"
-                    loading="lazy"
-                    decoding="async"
-                    className="max-h-44 rounded-lg object-contain"
-                  />
+                  <img src={previewUrl} alt="Leaf specimen preview" loading="lazy" decoding="async" className="max-h-44 rounded-lg object-contain" />
                   <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl">
-                    <span className="text-xs font-semibold text-white bg-slate-900/90 px-3 py-1.5 rounded-lg border border-slate-700">
-                      Change Specimen Photo
-                    </span>
+                    <span className="text-xs font-semibold text-white bg-slate-900/90 px-3 py-1.5 rounded-lg border border-slate-700">Change Specimen Photo</span>
                   </div>
                 </div>
               ) : (
@@ -217,50 +166,34 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
                   <p className="text-[11px] text-slate-400">Generates 2048-dim Inception-V3 feature vector</p>
                 </div>
               )}
-
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
+              <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
             </label>
 
             {selectedFile && (
               <div className="mt-4 flex items-center justify-between">
-                <span className="text-xs text-slate-400 truncate max-w-[220px]">
-                  File: {selectedFile.name}
-                </span>
+                <span className="text-xs text-slate-400 truncate max-w-[220px]">File: {selectedFile.name}</span>
                 <button
                   onClick={handleRunClassification}
                   disabled={loading}
                   className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-bold text-xs hover:opacity-95 transition-all shadow-md shadow-emerald-500/20 disabled:opacity-50"
                 >
                   {loading ? (
-                    <>
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                      <span>Extracting & Classifying...</span>
-                    </>
+                    <><RefreshCw className="w-3.5 h-3.5 animate-spin" /><span>Extracting & Classifying...</span></>
                   ) : (
-                    <>
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>Run Classification</span>
-                    </>
+                    <><Sparkles className="w-3.5 h-3.5" /><span>Run Classification</span></>
                   )}
                 </button>
               </div>
             )}
           </div>
 
-          {/* Option B: Specimen Gallery Presets */}
+          {/* Specimen Gallery Presets */}
           <div className="glass-card rounded-2xl p-5 border border-slate-800">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-1 flex items-center space-x-2">
               <Sparkles className="w-3.5 h-3.5 text-teal-400" />
               <span>Quick Test Specimen Presets ({selectedDataset.toUpperCase()})</span>
             </h3>
-            <p className="text-[11px] text-slate-400 mb-3">
-              One-click testing samples for the active dataset.
-            </p>
+            <p className="text-[11px] text-slate-400 mb-3">One-click testing samples for the active dataset.</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {activePresetsToDisplay.map((preset) => (
@@ -275,26 +208,18 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
                   }`}
                 >
                   <div className="flex items-start justify-between mb-0.5">
-                    <span className="font-bold text-xs text-white group-hover:text-emerald-400 transition-colors">
-                      {preset.label}
-                    </span>
-                    <span className="text-[9px] uppercase font-semibold px-1.5 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800">
-                      {preset.dataset}
-                    </span>
+                    <span className="font-bold text-xs text-white group-hover:text-emerald-400 transition-colors">{preset.label}</span>
+                    <span className="text-[9px] uppercase font-semibold px-1.5 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800">{preset.dataset}</span>
                   </div>
-                  <div className="text-xs font-medium text-emerald-400 italic mb-0.5">
-                    {preset.name}
-                  </div>
-                  <p className="text-[11px] text-slate-400 line-clamp-1">
-                    {preset.description}
-                  </p>
+                  <div className="text-xs font-medium text-emerald-400 italic mb-0.5">{preset.name}</div>
+                  <p className="text-[11px] text-slate-400 line-clamp-1">{preset.description}</p>
                 </button>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Right Column: Prediction Output Card */}
+        {/* Right Column: Single Prediction Result */}
         <div className="lg:col-span-5">
           <div className="glass-card rounded-2xl p-5 border border-slate-800 sticky top-24">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center justify-between">
@@ -329,12 +254,8 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
               <div className="space-y-4">
                 {/* Primary Species Badge */}
                 <div className="p-4 rounded-xl bg-gradient-to-br from-slate-900 to-slate-950 border border-emerald-500/30">
-                  <div className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider mb-0.5">
-                    Top Predicted Species
-                  </div>
-                  <div className="text-lg font-extrabold text-white mb-1 capitalize italic">
-                    {result.predictedClass}
-                  </div>
+                  <div className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider mb-0.5">Top Predicted Species</div>
+                  <div className="text-lg font-extrabold text-white mb-1 capitalize italic">{result.predictedClass}</div>
                   <div className="text-[11px] text-slate-400 flex items-center space-x-1.5">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                     <span>Verified via Tribuo ML Pipeline</span>
@@ -355,9 +276,7 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
                             <div className="flex items-center space-x-2">
                               <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                                 idx === 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'
-                              }`}>
-                                #{idx + 1}
-                              </span>
+                              }`}>#{idx + 1}</span>
                               <span className="font-semibold text-slate-200 italic">{cand.label}</span>
                             </div>
                             <span className="font-mono text-xs font-bold text-emerald-400">{cand.confidence.toFixed(1)}%</span>
@@ -385,7 +304,6 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
                       {result.featureCount} <span className="text-xs text-slate-400 font-normal">/ 2048</span>
                     </div>
                   </div>
-
                   <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
                     <div className="text-[10px] text-slate-400 uppercase font-semibold mb-0.5 flex items-center space-x-1">
                       <Sparkles className="w-3 h-3 text-teal-400" />
@@ -400,9 +318,7 @@ export const LeafClassifier: React.FC<LeafClassifierProps> = ({
             ) : (
               <div className="py-12 flex flex-col items-center justify-center text-center space-y-2 text-slate-400">
                 <Leaf className="w-8 h-8 text-slate-700" />
-                <p className="text-xs">
-                  Upload an image or pick a test specimen to view inference metrics.
-                </p>
+                <p className="text-xs">Upload an image or pick a test specimen to view inference metrics.</p>
               </div>
             )}
           </div>
