@@ -26,7 +26,6 @@ export const SideBySideBenchmark: React.FC<SideBySideBenchmarkProps> = ({
   ];
 
   const hasBoth = gbcsData !== null && bcsData !== null;
-  const winner = hasBoth ? (gbcsData.confidenceScore >= bcsData.confidenceScore ? 'gbcs' : 'bcs') : null;
 
   return (
     <div className="space-y-8">
@@ -58,14 +57,9 @@ export const SideBySideBenchmark: React.FC<SideBySideBenchmarkProps> = ({
           {/* Side by Side Comparison Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Proposed GBCS Card */}
-            <div className={`relative glass-card rounded-2xl p-6 border-2 transition-all ${winner === 'gbcs' ? 'border-emerald-500/50 shadow-xl shadow-emerald-500/10' : 'border-slate-800/80'}`}>
-              {winner === 'gbcs' && (
-                <div className="absolute -top-3 right-6 bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-extrabold text-[10px] uppercase tracking-wider px-3 py-0.5 rounded-full shadow">
-                  Proposed Method Winner 🏆
-                </div>
-              )}
+            <div className="relative glass-card rounded-2xl p-6 border-2 border-emerald-500/30 shadow-lg shadow-emerald-500/5 transition-all">
               <div className="flex items-center space-x-3 mb-4">
-                <div className={`p-2.5 rounded-xl ${winner === 'gbcs' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}>
+                <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                   <ShieldCheck className="w-6 h-6" />
                 </div>
                 <div>
@@ -76,7 +70,7 @@ export const SideBySideBenchmark: React.FC<SideBySideBenchmarkProps> = ({
               <div className="space-y-4">
                 <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
                   <div className="text-[11px] font-semibold text-slate-400 uppercase mb-1">Predicted Specimen</div>
-                  <div className={`text-xl font-black capitalize ${winner === 'gbcs' ? 'text-emerald-400' : 'text-slate-200'}`}>{gbcsData.predictedClass}</div>
+                  <div className="text-xl font-black capitalize text-emerald-400">{gbcsData.predictedClass}</div>
                   <div className="mt-2 flex items-center justify-between text-xs">
                     <span className="text-slate-400">Model Confidence</span>
                     <span className="font-bold text-white font-mono">{(gbcsData.confidenceScore * 100).toFixed(2)}%</span>
@@ -96,14 +90,9 @@ export const SideBySideBenchmark: React.FC<SideBySideBenchmarkProps> = ({
             </div>
 
             {/* Baseline BCS Card */}
-            <div className={`relative glass-card rounded-2xl p-6 border-2 transition-all ${winner === 'bcs' ? 'border-emerald-500/50 shadow-xl shadow-emerald-500/10' : 'border-slate-800/80'}`}>
-              {winner === 'bcs' && (
-                <div className="absolute -top-3 right-6 bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-extrabold text-[10px] uppercase tracking-wider px-3 py-0.5 rounded-full shadow">
-                  Baseline Method Winner 🏆
-                </div>
-              )}
+            <div className="relative glass-card rounded-2xl p-6 border-2 border-slate-800/80 transition-all">
               <div className="flex items-center space-x-3 mb-4">
-                <div className={`p-2.5 rounded-xl ${winner === 'bcs' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}>
+                <div className="p-2.5 rounded-xl bg-slate-800 text-slate-400 border border-slate-700">
                   <Activity className="w-6 h-6" />
                 </div>
                 <div>
@@ -114,7 +103,7 @@ export const SideBySideBenchmark: React.FC<SideBySideBenchmarkProps> = ({
               <div className="space-y-4">
                 <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
                   <div className="text-[11px] font-semibold text-slate-400 uppercase mb-1">Predicted Specimen</div>
-                  <div className={`text-xl font-black capitalize ${winner === 'bcs' ? 'text-emerald-400' : 'text-slate-200'}`}>{bcsData.predictedClass}</div>
+                  <div className="text-xl font-black capitalize text-slate-200">{bcsData.predictedClass}</div>
                   <div className="mt-2 flex items-center justify-between text-xs">
                     <span className="text-slate-400">Model Confidence</span>
                     <span className="font-bold text-slate-200 font-mono">{(bcsData.confidenceScore * 100).toFixed(2)}%</span>
