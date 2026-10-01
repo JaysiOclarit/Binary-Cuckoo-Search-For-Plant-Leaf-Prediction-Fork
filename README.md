@@ -184,7 +184,7 @@ npm install
 #### Step 2: Start the Backend Server (Terminal 1)
 ```powershell
 cd backend
-.\mvn.cmd spring-boot:run
+mvn.cmd spring-boot:run
 ```
 *(On macOS/Linux, run `./mvnw spring-boot:run` or `mvn spring-boot:run`)*.
 The backend API and Tribuo ML engine will start on **`http://localhost:8080`**.
